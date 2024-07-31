@@ -240,6 +240,7 @@ require('lazy').setup({
   -- "gc" to comment visual regions/lines
   { 'numToStr/Comment.nvim', opts = {} },
 
+  { 'ThePrimeagen/vim-be-good', opts = {} },
   {
     'FabijanZulj/blame.nvim',
     config = function()
