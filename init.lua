@@ -363,7 +363,9 @@ require('lazy').setup({
         --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
         --   },
         -- },
-        -- pickers = {}
+        pickers = {
+          find_files = { path_display = { 'smart' } },
+        },
         extensions = {
           ['ui-select'] = {
             require('telescope.themes').get_dropdown(),
@@ -379,7 +381,6 @@ require('lazy').setup({
       -- See `:help telescope.builtin`
       local builtin = require 'telescope.builtin'
 
-      builtin.find_files { path_display = { 'truncate' } }
       vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
       vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
       vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
@@ -656,10 +657,10 @@ require('lazy').setup({
         -- Disable "format_on_save lsp_fallback" for languages that don't
         -- have a well standardized coding style. You can add additional
         -- languages here or re-enable it for the disabled ones.
-        --local disable_filetypes = { c = true, cpp = true }
+        local disable_filetypes = { cpp = true, c = true, h = true }
         return {
           timeout_ms = 500,
-          lsp_fallback = true, --not disable_filetypes[vim.bo[bufnr].filetype],
+          lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
         }
       end,
       formatters_by_ft = {
