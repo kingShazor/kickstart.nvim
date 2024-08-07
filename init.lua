@@ -373,6 +373,10 @@ require('lazy').setup({
         -- },
         pickers = {
           find_files = { path_display = { 'smart' } },
+          file_browser = { { cwd_to_path = true, path = '%:p:h' } },
+          grep_string = { path_display = { 'smart' } },
+          oldfiles = { path_display = { 'smart' } },
+          buffers = { path_display = { 'smart' } },
         },
         extensions = {
           ['ui-select'] = {
@@ -401,7 +405,7 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
 
       vim.keymap.set('n', '<space>fb', function()
-        require('telescope').extensions.file_browser.file_browser()
+        require('telescope').extensions.file_browser.file_browser { cwd_to_path = false, path = '%:p:h' }
       end)
 
       -- Slightly advanced example of overriding default behavior and theme
