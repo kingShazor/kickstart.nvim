@@ -371,12 +371,18 @@ require('lazy').setup({
         --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
         --   },
         -- },
+        defaults = {
+          layout_config = {
+            width = 0.99,
+          },
+        },
         pickers = {
-          find_files = { path_display = { 'smart' } },
+          find_files = { path_display = { 'smart' }, hidden = true },
           file_browser = { { cwd_to_path = true, path = '%:p:h' } },
           grep_string = { path_display = { 'smart' } },
           oldfiles = { path_display = { 'smart' } },
           buffers = { path_display = { 'smart' } },
+          lsp_references = { path_display = { 'tail' } },
         },
         extensions = {
           ['ui-select'] = {
