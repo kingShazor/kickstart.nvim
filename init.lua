@@ -411,6 +411,10 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
       vim.keymap.set('n', '<leader>o', 'o<Esc>k', { desc = '[ o] Insert line under curser' })
       vim.keymap.set('n', '<leader>O', 'O<Esc>j', { desc = '[ o] Insert line above curser' })
+      vim.keymap.set('n', '<leader>n', function()
+        local bufferName = vim.api.nvim_buf_get_name(0)
+        vim.fn.setreg('+', bufferName)
+      end, { desc = '[ o] Insert line above curser' })
 
       vim.keymap.set('n', '<space>fb', function()
         require('telescope').extensions.file_browser.file_browser { cwd_to_path = false, path = '%:p:h' }
