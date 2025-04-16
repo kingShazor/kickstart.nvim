@@ -414,7 +414,47 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>n', function()
         local bufferName = vim.api.nvim_buf_get_name(0)
         vim.fn.setreg('+', bufferName)
-      end, { desc = '[ o] Insert line above curser' })
+      end, { desc = '[ b] copy buffer name to clipboard' })
+      vim.keymap.set('n', '<leader>g', function()
+        local filepath = vim.api.nvim_buf_get_name(0)
+        local cmd = { 'git', 'log', '--pretty=format:%h %ad %an %s', '--date=short', '--follow', '--', filepath }
+
+        vim.fn.jobstart(cmd, {
+          stdout_buffered = true,
+          on_stdout = function(_, data)
+            if not data then
+              return
+            end
+            local lines = vim.tbl_filter(function(line)
+              return line ~= ''
+            end, data)
+
+            -- Floating Window erstellen
+            local buf = vim.api.nvim_create_buf(false, true)
+            vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+            vim.api.nvim_buf_set_keymap(buf, 'n', 'q', '<cmd>bd!<CR>', {
+              nowait = true,
+              noremap = true,
+              silent = true,
+            })
+
+            local width = math.floor(vim.o.columns * 0.8)
+            local height = math.floor(vim.o.lines * 0.6)
+            local row = math.floor((vim.o.lines - height) / 2)
+            local col = math.floor((vim.o.columns - width) / 2)
+
+            vim.api.nvim_open_win(buf, true, {
+              relative = 'editor',
+              width = width,
+              height = height,
+              row = row,
+              col = col,
+              style = 'minimal',
+              border = 'rounded',
+            })
+          end,
+        })
+      end, { desc = '[ g] show git history' })
 
       vim.keymap.set('n', '<space>fb', function()
         require('telescope').extensions.file_browser.file_browser { cwd_to_path = false, path = '%:p:h' }
