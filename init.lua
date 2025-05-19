@@ -535,7 +535,7 @@ require('lazy').setup({
         })
       end, { desc = '[ g] show git history' })
 
-      vim.keymap.set('n', '<space>fb', function()
+      vim.keymap.set('n', '<leader>F', function()
         require('telescope').extensions.file_browser.file_browser { cwd_to_path = false, path = '%:p:h' }
       end)
 
