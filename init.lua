@@ -279,16 +279,6 @@ require('lazy').setup({
     branch = 'harpoon2',
     dependencies = { 'nvim-lua/plenary.nvim' },
   },
-  {
-    'kylechui/nvim-surround',
-    version = '^3.0.0', -- Use for stability; omit to use `main` branch for the latest features
-    event = 'VeryLazy',
-    config = function()
-      require('nvim-surround').setup {
-        -- Configuration here, or leave empty to use defaults
-      }
-    end,
-  },
 
   -- NOTE: Plugins can also be configured to run Lua code when they are loaded.
   --
@@ -554,8 +544,6 @@ require('lazy').setup({
       end, { desc = '[S]earch [N]eovim files' })
     end,
   },
-
-
 
   -- You can add other tools here that you want Mason to install
   -- for you, so that they are available from within Neovim.
@@ -890,9 +878,9 @@ map('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
 -- or a suggestion from your LSP for this to activate.
 map('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
 
-  --        -- Opens a popup that displays documentation about the word under your cursor
-  --        --  See `:help K` for why this keymap.
-  --        map('K', vim.lsp.buf.hover, 'Hover Documentation')
+--        -- Opens a popup that displays documentation about the word under your cursor
+--        --  See `:help K` for why this keymap.
+--        map('K', vim.lsp.buf.hover, 'Hover Documentation')
 
 -- WARN: This is not Goto Definition, this is Goto Declaration.
 --  For example, in C this would take you to the header.
@@ -913,7 +901,7 @@ function ClangdSwitchSourceHeader()
       return
     end
     if not result then
-      vim.notify('No corresponding file found (source/header switch failed).')
+      vim.notify 'No corresponding file found (source/header switch failed).'
       return
     end
     vim.cmd('edit ' .. vim.uri_to_fname(result))
