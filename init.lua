@@ -219,8 +219,9 @@ if not vim.loop.fs_stat(lazypath) then
 end ---@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
 
+local compile_commands_dir = os.getenv("CLANGD_COMPILE_COMMANDS_DIR") or "."
 vim.lsp.config.clangd = {
-  cmd = { 'clangd', '--background-index' },
+  cmd = { 'clangd', '--background-index', '--compile-commands-dir=' .. compile_commands_dir },
   root_markers = { 'compile_commands.json', 'compile_flags.txt' },
   filetypes = { 'c', 'cpp' },
 }
