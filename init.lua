@@ -897,7 +897,29 @@ map('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
 -- WARN: This is not Goto Definition, this is Goto Declaration.
 --  For example, in C this would take you to the header.
 map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
+-- Global nutzbar machen
+function ClangdSwitchSourceHeader()
+  local bufnr = vim.api.nvim_get_current_buf()
+  local method = 'textDocument/switchSourceHeader'
+  local client = vim.lsp.get_clients({ bufnr = bufnr, name = 'clangd' })[1]
+  if not client then
+    return vim.notify(('Method %s not supported by active LSP client.'):format(method), vim.log.levels.ERROR)
+  end
 
-map('<leader><Tab>', '<cmd>:ClangdSwitchSourceHeader<CR>', 'switch between source and header')
+  local params = vim.lsp.util.make_text_document_params(bufnr)
+  client.request(method, params, function(err, result)
+    if err then
+      vim.notify('Error switching source/header: ' .. err.message, vim.log.levels.ERROR)
+      return
+    end
+    if not result then
+      vim.notify('No corresponding file found (source/header switch failed).')
+      return
+    end
+    vim.cmd('edit ' .. vim.uri_to_fname(result))
+  end, bufnr)
+end
+
+map('<leader><Tab>', ClangdSwitchSourceHeader, 'switch between source and header')
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
