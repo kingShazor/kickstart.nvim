@@ -471,10 +471,10 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>O', 'O<Esc>j', { desc = '[ o] Insert line above curser' })
       vim.keymap.set('n', '<leader>gd', ':DiffviewOpen<CR>', { desc = 'Git Diffview open' })
       vim.keymap.set('n', '<leader>gD', ':DiffviewFileHistory<CR>', { desc = 'Git File History' })
-      vim.keymap.set('n', '<leader>n', function()
+      vim.keymap.set('n', '<leader>b', function()
         local bufferName = vim.api.nvim_buf_get_name(0)
         vim.fn.setreg('+', bufferName)
-      end, { desc = '[ b] copy buffer name to clipboard' })
+      end, { desc = '[<leader>b] copy buffer name to clipboard' })
       vim.keymap.set('n', '<C-g>', function()
         local filepath = vim.api.nvim_buf_get_name(0)
         local cmd = { 'git', 'log', '--pretty=format:%h %ad %an %s', '--date=short', '--follow', '--', filepath }
@@ -759,6 +759,7 @@ require('lazy').setup({
         return '%2l:%-2v'
       end
 
+      require('mini.files').setup()
       -- ... and there is more!
       --  Check out: https://github.com/echasnovski/mini.nvim
     end,
