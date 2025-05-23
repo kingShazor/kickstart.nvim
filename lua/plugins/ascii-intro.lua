@@ -1,5 +1,5 @@
 return {
-  dir = '/home/pme/.config/nvim/lua/plugins',
+  dir = '~/.config/nvim/lua/plugins',
   name = 'ascii-intro',
   lazy = false, -- direkt beim Start laden
   priority = 1000, -- früh laden

@@ -1016,31 +1016,5 @@ end
 map('<leader><Tab>', ClangdSwitchSourceHeader, 'switch between source and header')
 vim.api.nvim_set_hl(0, 'MiniCursorword', { bg = '#5a4a2f', underline = false })
 vim.api.nvim_set_hl(0, 'MiniCursorwordCurrent', { bg = '#5f875f', bold = true })
---if #vim.api.nvim_list_bufs() == 1 and vim.api.nvim_buf_get_name(0) == '' then
---  local intro = {
---    [[                                                                       ]],
---    [[  ██████   █████                   █████   █████  ███                  ]],
---    [[ ░░██████ ░░███                   ░░███   ░░███  ░░░                   ]],
---    [[  ░███░███ ░███   ██████   ██████  ░███    ░███  ████  █████████████   ]],
---    [[  ░███░░███░███  ███░░███ ███░░███ ░███    ░███ ░░███ ░░███░░███░░███  ]],
---    [[  ░███ ░░██████ ░███████ ░███ ░███ ░░███   ███   ░███  ░███ ░███ ░███  ]],
---    [[  ░███  ░░█████ ░███░░░  ░███ ░███  ░░░█████░    ░███  ░███ ░███ ░███  ]],
---    [[  █████  ░░█████░░██████ ░░██████     ░░███      █████ █████░███ █████ ]],
---    [[ ░░░░░    ░░░░░  ░░░░░░   ░░░░░░       ░░░      ░░░░░ ░░░░░ ░░░ ░░░░░  ]],
---    [[                                                                       ]],
---    'NVIM v0.11.1',
---    'Type  :help nvim<Enter>          to get started',
---    'Type  :checkhealth<Enter>       to optimize your setup',
---    'Type  :quit<Enter>              to exit',
---    'Type  :help<Enter>              for help',
---    'Type  :help news<Enter>         to see changes in this version',
---    '',
---  }
---  for i = 1, 9 do
---    vim.api.nvim_buf_add_highlight(0, -1, 'YellowHighlight', i, 0, -1)
---  end
---  vim.api.nvim_buf_set_lines(0, 0, -1, false, intro)
---  vim.bo.modified = false
---end
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
