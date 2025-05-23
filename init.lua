@@ -219,7 +219,7 @@ if not vim.loop.fs_stat(lazypath) then
 end ---@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
 
-local compile_commands_dir = os.getenv("CLANGD_COMPILE_COMMANDS_DIR") or "."
+local compile_commands_dir = os.getenv 'CLANGD_COMPILE_COMMANDS_DIR' or '.'
 vim.lsp.config.clangd = {
   cmd = { 'clangd', '--background-index', '--compile-commands-dir=' .. compile_commands_dir },
   root_markers = { 'compile_commands.json', 'compile_flags.txt' },
@@ -227,6 +227,31 @@ vim.lsp.config.clangd = {
 }
 
 vim.lsp.enable { 'clangd' }
+
+vim.lsp.config.luals = {
+  -- Command and arguments to start the server.
+  cmd = { 'lua-language-server' },
+  -- Filetypes to automatically attach to.
+  filetypes = { 'lua' },
+  -- Sets the "root directory" to the parent directory of the file in the
+  -- current buffer that contains either a ".luarc.json" or a
+  -- ".luarc.jsonc" file. Files that share a root directory will reuse
+  -- the connection to the same LSP server.
+  -- Nested lists indicate equal priority, see |vim.lsp.Config|.
+  root_markers = { { '.luarc.json', '.luarc.jsonc' }, '.git' },
+  -- Specific settings to send to the server. The schema for this is
+  -- defined by the server. For example the schema for lua-language-server
+  -- can be found here https://raw.githubusercontent.com/LuaLS/vscode-lua/master/setting/schema.json
+  settings = {
+    Lua = {
+      runtime = {
+        version = 'LuaJIT',
+      },
+    },
+  },
+}
+vim.lsp.enable { 'luals' }
+
 -- [[ Configure and install plugins ]]
 --
 --  To check the current status of your plugins, run
@@ -261,6 +286,10 @@ require('lazy').setup({
     end,
   },
   {
+    'mason-org/mason.nvim',
+    opts = {},
+  },
+  {
     'folke/noice.nvim',
     event = 'VeryLazy',
     opts = {
@@ -273,6 +302,13 @@ require('lazy').setup({
       --   `nvim-notify` is only needed, if you want to use the notification view.
       --   If not available, we use `mini` as the fallback
       'rcarriga/nvim-notify',
+    },
+    lsp = {
+      override = {
+        ['vim.lsp.util.convert_input_to_markdown_lines'] = true,
+        ['vim.lsp.util.stylize_markdown'] = true,
+        ['cmp.entry.get_documentation'] = true,
+      },
     },
   },
   {
