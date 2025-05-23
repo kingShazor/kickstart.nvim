@@ -209,7 +209,11 @@ vim.api.nvim_create_autocmd('TextYankPost', {
     vim.highlight.on_yank()
   end,
 })
-
+vim.api.nvim_create_autocmd('CmdlineEnter', {
+  callback = function()
+    require('notify').dismiss { silent = true, pending = true }
+  end,
+})
 -- [[ Install `lazy.nvim` plugin manager ]]
 --    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
@@ -788,6 +792,8 @@ require('lazy').setup({
       -- set use_icons to true if you have a Nerd Font
       statusline.setup { use_icons = vim.g.have_nerd_font }
 
+      require('mini.cursorword').setup()
+
       -- You can configure sections in the statusline by overriding their
       -- default behavior. For example, here we set the section for
       -- cursor location to LINE:COLUMN
@@ -796,7 +802,7 @@ require('lazy').setup({
         return '%2l:%-2v'
       end
 
-      require('mini.files').setup()
+      -- require('mini.files').setup()
       -- ... and there is more!
       --  Check out: https://github.com/echasnovski/mini.nvim
     end,
@@ -947,5 +953,7 @@ function ClangdSwitchSourceHeader()
 end
 
 map('<leader><Tab>', ClangdSwitchSourceHeader, 'switch between source and header')
+vim.api.nvim_set_hl(0, 'MiniCursorword', { bg = '#5a4a2f', underline = false })
+vim.api.nvim_set_hl(0, 'MiniCursorwordCurrent', { bg = '#5f875f', bold = true })
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
