@@ -767,6 +767,29 @@ require('lazy').setup({
     end,
   },
 
+  --{
+  --  'edluffy/specs.nvim',
+  --  config = function()
+  --    require('specs').setup {
+  --      show_jumps = true,
+  --      min_jump = 10,
+  --      popup = {
+  --        delay_ms = 0, -- delay before popup displays
+  --        inc_ms = 10, -- time increments used for fade/resize effects
+  --        blend = 10, -- starting blend, between 0-100 (fully transparent), see :h winblend
+  --        width = 10,
+  --        winhl = 'PMenu',
+  --        fader = require('specs').linear_fader,
+  --        resizer = require('specs').shrink_resizer,
+  --      },
+  --      ignore_filetypes = {},
+  --      ignore_buftypes = {
+  --        nofile = true,
+  --      },
+  --    }
+  --  end,
+  --},
+
   { -- Collection of various small independent plugins/modules
     'echasnovski/mini.nvim',
     config = function()
@@ -793,7 +816,28 @@ require('lazy').setup({
       statusline.setup { use_icons = vim.g.have_nerd_font }
 
       require('mini.cursorword').setup()
-
+      require('mini.animate').setup {
+        cursor = {
+          enable = true,
+          timing = require('mini.animate').gen_timing.linear { duration = 100, unit = 'total' },
+        },
+        scroll = {
+          enable = true,
+          timing = require('mini.animate').gen_timing.linear { duration = 150, unit = 'total' },
+        },
+        resize = {
+          enable = true,
+          timing = require('mini.animate').gen_timing.linear { duration = 100, unit = 'total' },
+        },
+        open = {
+          enable = true,
+          timing = require('mini.animate').gen_timing.linear { duration = 100, unit = 'total' },
+        },
+        close = {
+          enable = true,
+          timing = require('mini.animate').gen_timing.linear { duration = 100, unit = 'total' },
+        },
+      }
       -- You can configure sections in the statusline by overriding their
       -- default behavior. For example, here we set the section for
       -- cursor location to LINE:COLUMN
