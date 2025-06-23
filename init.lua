@@ -230,15 +230,6 @@ vim.lsp.config.clangd = {
   cmd = { 'clangd', '--background-index', '--compile-commands-dir=' .. compile_commands_dir },
   root_markers = { 'compile_commands.json', 'compile_flags.txt' },
   filetypes = { 'c', 'cpp' },
-  capabilities = vim.tbl_deep_extend('force', vim.lsp.protocol.make_client_capabilities(), {
-    textDocument = {
-      completion = {
-        completionItem = {
-          snippetSupport = false,
-        },
-      },
-    },
-  }),
 }
 
 vim.lsp.enable { 'clangd' }
@@ -696,6 +687,11 @@ require('lazy').setup({
 
       -- (Default) Only show the documentation popup when manually triggered
       completion = { documentation = { auto_show = false } },
+      -- Default list of enabled providers defined so that you can extend it
+      -- elsewhere in your config, without redefining it, due to `opts_extend`
+      sources = {
+        default = { 'lsp', 'path', 'snippets', 'buffer' },
+      },
 
       -- (Default) Rust fuzzy matcher for typo resistance and significantly better performance
       -- You may use a lua implementation instead by using `implementation = "lua"` or fallback to the lua implementation,
