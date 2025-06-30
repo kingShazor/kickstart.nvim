@@ -225,9 +225,10 @@ if not vim.loop.fs_stat(lazypath) then
 end ---@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
 
-local compile_commands_dir = os.getenv 'CLANGD_COMPILE_COMMANDS_DIR' or '.'
+local compile_commands_dir = os.getenv 'CLANGD_COMPILE_COMMANDS_DIR' or os.getenv 'PWD'
+local clangd_bin = vim.fn.executable 'clangd' == 1 and 'clangd' or 'clangd-15'
 vim.lsp.config.clangd = {
-  cmd = { 'clangd', '--background-index', '--compile-commands-dir=' .. compile_commands_dir },
+  cmd = { clangd_bin, '--background-index', '--compile-commands-dir=' .. compile_commands_dir },
   root_markers = { 'compile_commands.json', 'compile_flags.txt' },
   filetypes = { 'c', 'cpp' },
 }
@@ -578,7 +579,7 @@ require('lazy').setup({
             })
           end,
         })
-      end, { desc = '[ g] show git history' })
+      end, { desc = '[<C-g] show git history for buffer' })
 
       vim.keymap.set('n', '<leader>F', function()
         require('telescope').extensions.file_browser.file_browser { cwd_to_path = false, path = '%:p:h' }
