@@ -195,7 +195,7 @@ vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower win
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 vim.keymap.set('n', '<M-j>', '<cmd>cnext<CR>', { desc = 'jump to next Quick-Fix' })
 vim.keymap.set('n', '<M-k>', '<cmd>cprev<CR>', { desc = 'jump to prev Quick-Fix' })
-
+vim.keymap.set('n', '-', '<CMD>Oil<CR>', { desc = 'Open parent directory' })
 vim.diagnostic.config { virtual_text = true }
 
 -- [[ Basic Autocommands ]]
@@ -459,6 +459,7 @@ require('lazy').setup({
         pickers = {
           find_files = { path_display = { 'smart' }, hidden = true },
           file_browser = { { cwd_to_path = true, path = '%:p:h' } },
+          keymaps = { layout_config = { prompt_position = 'top' } },
           grep_string = { path_display = { 'smart' } },
           oldfiles = { path_display = { 'smart' } },
           buffers = { path_display = { 'smart' } },
@@ -732,7 +733,17 @@ require('lazy').setup({
       require('diffview').setup()
     end,
   },
-
+  {
+    'stevearc/oil.nvim',
+    ---@module 'oil'
+    ---@type oil.SetupOpts
+    opts = {},
+    -- Optional dependencies
+    dependencies = { { 'echasnovski/mini.icons', opts = {} } },
+    -- dependencies = { "nvim-tree/nvim-web-devicons" }, -- use if you prefer nvim-web-devicons
+    -- Lazy loading is not recommended because it is very tricky to make it work correctly in all situations.
+    lazy = false,
+  },
   { -- Collection of various small independent plugins/modules
     'echasnovski/mini.nvim',
     config = function()
