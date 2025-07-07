@@ -284,9 +284,6 @@ require('lazy').setup({
   --    require('Comment').setup({})
 
   { import = 'plugins' },
-  -- "gc" to comment visual regions/lines
-  { 'numToStr/Comment.nvim', opts = {} },
-
   {
     'FabijanZulj/blame.nvim',
     config = function()
