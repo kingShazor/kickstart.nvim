@@ -982,5 +982,38 @@ map('<leader><Tab>', ClangdSwitchSourceHeader, 'switch between source and header
 vim.api.nvim_set_hl(0, 'MiniCursorword', { bg = '#5a4a2f', underline = false })
 vim.api.nvim_set_hl(0, 'MiniCursorwordCurrent', { bg = '#5f875f', bold = true })
 
+local timer = nil
+local reportTimer = nil
+local checkInterval = 3600000
+local reportTime = 1200000
+local reportMode = false
+local updateFound = 0
+
+local function checkUpdates()
+  local handle = io.popen 'apt list --upgradable 2>/dev/null | grep jammy | wc -l'
+  if handle then
+    local result = handle:read '*a'
+    handle:close()
+    updateFound = tonumber(result) or 0
+  end
+end
+
+local function notifyTimes()
+  vim.notify(('%d security updates found'):format(updateFound))
+end
+
+local function checkTimes()
+  checkUpdates()
+  if updateFound > 0 and not reportMode then
+    reportMode = true
+    timer:stop()
+    timer:close()
+    reportTimer = vim.uv.new_timer()
+    reportTimer:start(100, reportTime, vim.schedule_wrap(notifyTimes))
+  end
+end
+
+timer = vim.uv.new_timer()
+timer:start(5000, checkInterval, vim.schedule_wrap(checkTimes))
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
