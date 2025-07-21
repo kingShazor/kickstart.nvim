@@ -195,7 +195,9 @@ vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower win
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 vim.keymap.set('n', '<M-j>', '<cmd>cnext<CR>', { desc = 'jump to next Quick-Fix' })
 vim.keymap.set('n', '<M-k>', '<cmd>cprev<CR>', { desc = 'jump to prev Quick-Fix' })
-vim.keymap.set('n', '-', '<CMD>Oil<CR>', { desc = 'Open parent directory' })
+if not vim.g.vscode then
+  vim.keymap.set('n', '-', '<CMD>Oil<CR>', { desc = 'Open parent directory' })
+end
 vim.diagnostic.config { virtual_text = true }
 
 -- [[ Basic Autocommands ]]
@@ -740,6 +742,7 @@ require('lazy').setup({
     -- dependencies = { "nvim-tree/nvim-web-devicons" }, -- use if you prefer nvim-web-devicons
     -- Lazy loading is not recommended because it is very tricky to make it work correctly in all situations.
     lazy = false,
+    cond = not vim.g.vscode,
   },
   --  {
   --    'folke/flash.nvim',
