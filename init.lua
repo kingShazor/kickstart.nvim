@@ -167,6 +167,10 @@ vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next [D]iagn
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Show diagnostic [E]rror messages' })
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 
+vim.keymap.set('n', '<leader>w', ':write<CR>', { desc = '[w]rite buffer' })
+vim.keymap.set('n', '<leader>q', ':quit<CR>', { desc = '[q]uit nvim' })
+vim.keymap.set('n', '<leader>R', ':update<CR> :source<CR>', { desc = 'Source files' })
+
 -- Shift+C für Visual Block Mode
 vim.keymap.set('n', '<v', '<c-v>', { desc = 'block mode' })
 -- vim.key_map('v', '<S-c>', '<C-c>', { norema })
