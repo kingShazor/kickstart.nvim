@@ -236,7 +236,7 @@ local clangd_bin = vim.fn.executable 'clangd' == 1 and 'clangd' or 'clangd-15'
 vim.lsp.config.clangd = {
   cmd = { clangd_bin, '--background-index', '--compile-commands-dir=' .. compile_commands_dir },
   root_markers = { 'compile_commands.json', 'compile_flags.txt' },
-  filetypes = { 'c', 'cpp' },
+  filetypes = { 'c', 'cpp', 'ixx' },
 }
 
 vim.lsp.enable { 'clangd' }
@@ -265,6 +265,60 @@ vim.lsp.config.luals = {
 }
 vim.lsp.enable { 'luals' }
 
+-- der linter des Grauens
+-- vim.lsp.config.sqlls = {
+--   cmd = { 'sql-language-server', 'up', '--method', 'stdio' },
+--   filetypes = { 'sql', 'psql', 'oraclesql' },
+--   settings = {
+--     sqlLanguageServer = {
+--       diagnostics = {
+--         enabled = false, -- Deaktiviert Diagnosemeldungen
+--       },
+--     },
+--   },
+-- }
+--
+-- vim.lsp.enable { 'sqlls' }
+vim.api.nvim_create_autocmd('LspAttach', {
+  callback = function(args)
+    local client = vim.lsp.get_client_by_id(args.data.client_id)
+    if client and client.supports_method 'textDocument/documentHighlight' then
+      vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
+        buffer = args.buf,
+        callback = function()
+          vim.schedule(function()
+            vim.lsp.buf.document_highlight()
+          end)
+        end,
+      })
+      vim.api.nvim_create_autocmd({ 'CursorMoved', 'CursorMovedI' }, {
+        buffer = args.buf,
+        callback = function()
+          vim.schedule(function()
+            vim.lsp.buf.clear_references()
+          end)
+        end,
+      })
+    end
+  end,
+})
+--vim.api.nvim_create_autocmd('CursorHold', {
+--  pattern = '*',
+--  callback = function()
+--    vim.schedule(function()
+--      vim.lsp.buf.document_highlight()
+--    end)
+--  end,
+--})
+--
+--vim.api.nvim_create_autocmd('CursorMoved', {
+--  pattern = '*',
+--  callback = function()
+--    vim.schedule(function()
+--      vim.lsp.buf.clear_references()
+--    end)
+--  end,
+--})
 -- [[ Configure and install plugins ]]
 --
 --  To check the current status of your plugins, run
@@ -298,7 +352,9 @@ require('lazy').setup({
   },
   {
     'mason-org/mason.nvim',
-    opts = {},
+    opts = {
+      ensure_installed = { 'lua-language-server' },
+    },
   },
   {
     'folke/noice.nvim',
@@ -725,9 +781,6 @@ require('lazy').setup({
     end,
   },
 
-  -- Highlight todo, notes, etc in comments
-  { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
-
   {
     'sindrets/diffview.nvim',
     dependencies = { 'nvim-lua/plenary.nvim' },
@@ -787,29 +840,29 @@ require('lazy').setup({
       -- set use_icons to true if you have a Nerd Font
       statusline.setup { use_icons = vim.g.have_nerd_font }
 
-      require('mini.cursorword').setup()
-      require('mini.animate').setup {
-        cursor = {
-          enable = true,
-          timing = require('mini.animate').gen_timing.linear { duration = 100, unit = 'total' },
-        },
-        scroll = {
-          enable = true,
-          timing = require('mini.animate').gen_timing.linear { duration = 50, unit = 'total' },
-        },
-        resize = {
-          enable = true,
-          timing = require('mini.animate').gen_timing.linear { duration = 100, unit = 'total' },
-        },
-        open = {
-          enable = true,
-          timing = require('mini.animate').gen_timing.linear { duration = 100, unit = 'total' },
-        },
-        close = {
-          enable = true,
-          timing = require('mini.animate').gen_timing.linear { duration = 100, unit = 'total' },
-        },
-      }
+      -- require('mini.cursorword').setup()
+      --    require('mini.animate').setup {
+      --      cursor = {
+      --        enable = true,
+      --        timing = require('mini.animate').gen_timing.linear { duration = 100, unit = 'total' },
+      --      },
+      --      scroll = {
+      --        enable = true,
+      --        timing = require('mini.animate').gen_timing.linear { duration = 50, unit = 'total' },
+      --      },
+      --      resize = {
+      --        enable = true,
+      --        timing = require('mini.animate').gen_timing.linear { duration = 100, unit = 'total' },
+      --      },
+      --      open = {
+      --        enable = true,
+      --        timing = require('mini.animate').gen_timing.linear { duration = 100, unit = 'total' },
+      --      },
+      --      close = {
+      --        enable = true,
+      --        timing = require('mini.animate').gen_timing.linear { duration = 100, unit = 'total' },
+      --      },
+      --    }
       -- You can configure sections in the statusline by overriding their
       -- default behavior. For example, here we set the section for
       -- cursor location to LINE:COLUMN
