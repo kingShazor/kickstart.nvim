@@ -245,8 +245,6 @@ vim.lsp.config.clangd = {
   filetypes = { 'c', 'cpp', 'ixx' },
 }
 
-vim.lsp.enable { 'clangd' }
-
 vim.lsp.config.luals = {
   -- Command and arguments to start the server.
   cmd = { 'lua-language-server' },
@@ -269,7 +267,7 @@ vim.lsp.config.luals = {
     },
   },
 }
-vim.lsp.enable { 'luals' }
+vim.lsp.enable { 'clangd', 'luals' }
 
 -- der linter des Grauens
 -- vim.lsp.config.sqlls = {
