@@ -383,7 +383,7 @@ require('lazy').setup({
     dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.icons' }, -- if you use standalone mini plugins
     -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' }, -- if you prefer nvim-web-devicons
     ---@module 'render-markdown'
-    ---@type render.md.UserConfig
+    ---@type table render.md.UserConfig
     opts = {},
   },
   {
@@ -703,7 +703,7 @@ require('lazy').setup({
     -- build = 'nix run .#build-plugin',
 
     ---@module 'blink.cmp'
-    ---@type blink.cmp.Config
+    ---@type table blink.cmp.Config
     opts = {
       -- 'default' (recommended) for mappings similar to built-in completions (C-y to accept)
       -- 'super-tab' for mappings similar to vscode (tab to accept)
@@ -772,7 +772,7 @@ require('lazy').setup({
   {
     'stevearc/oil.nvim',
     ---@module 'oil'
-    ---@type oil.SetupOpts
+    ---@type table oil.SetupOpts
     opts = {},
     -- Optional dependencies
     dependencies = { { 'echasnovski/mini.icons', opts = {} } },
