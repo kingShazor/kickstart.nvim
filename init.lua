@@ -154,6 +154,11 @@ vim.opt.cursorline = true
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 10
 
+-- vim-sleuth Ersatz
+vim.opt.expandtab = true
+vim.opt.shiftwidth = 2
+vim.opt.tabstop = 2
+
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
 
@@ -165,7 +170,7 @@ vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous [D]iagnostic message' })
 vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next [D]iagnostic message' })
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Show diagnostic [E]rror messages' })
-vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
+vim.keymap.set('n', '<leader>x', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 
 vim.keymap.set('n', '<leader>w', ':write<CR>', { desc = '[w]rite buffer' })
 vim.keymap.set('n', '<leader>q', ':quit<CR>', { desc = '[q]uit nvim' })
@@ -199,6 +204,9 @@ vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower win
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 vim.keymap.set('n', '<M-j>', '<cmd>cnext<CR>', { desc = 'jump to next Quick-Fix' })
 vim.keymap.set('n', '<M-k>', '<cmd>cprev<CR>', { desc = 'jump to prev Quick-Fix' })
+--vim.keymap.set('n', '<M-j>', '<cmd>lnext<CR>', { desc = 'jump to next Quick-Fix' })
+-- vim.keymap.set('n', '<M-k>', '<cmd>lprev<CR>', { desc = 'jump to prev Quick-Fix' })
+
 if not vim.g.vscode then
   vim.keymap.set('n', '-', '<CMD>Oil<CR>', { desc = 'Open parent directory' })
 end
@@ -302,23 +310,6 @@ vim.api.nvim_create_autocmd('LspAttach', {
     end
   end,
 })
---vim.api.nvim_create_autocmd('CursorHold', {
---  pattern = '*',
---  callback = function()
---    vim.schedule(function()
---      vim.lsp.buf.document_highlight()
---    end)
---  end,
---})
---
---vim.api.nvim_create_autocmd('CursorMoved', {
---  pattern = '*',
---  callback = function()
---    vim.schedule(function()
---      vim.lsp.buf.clear_references()
---    end)
---  end,
---})
 -- [[ Configure and install plugins ]]
 --
 --  To check the current status of your plugins, run
@@ -332,7 +323,6 @@ vim.api.nvim_create_autocmd('LspAttach', {
 -- NOTE: Here is where you install your plugins.
 require('lazy').setup({
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
-  'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
 
   -- NOTE: Plugins can also be added by using a table,
   -- with the first argument being the link and the following
@@ -474,10 +464,6 @@ require('lazy').setup({
 
       -- Useful for getting pretty icons, but requires a Nerd Font.
       -- { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
-      {
-        'nvim-telescope/telescope-file-browser.nvim',
-        dependencies = { 'nvim-telescope/telescope.nvim', 'nvim-lua/plenary.nvim' },
-      },
     },
     config = function()
       -- Telescope is a fuzzy finder that comes with a lot of different things that
@@ -640,10 +626,6 @@ require('lazy').setup({
           end,
         })
       end, { desc = '[<C-g] show git history for buffer' })
-
-      vim.keymap.set('n', '<leader>F', function()
-        require('telescope').extensions.file_browser.file_browser { cwd_to_path = false, path = '%:p:h' }
-      end)
 
       -- Slightly advanced example of overriding default behavior and theme
       vim.keymap.set('n', '<leader>/', function()
@@ -1066,8 +1048,12 @@ local function checkTimes()
   checkUpdates()
   if updateFound > 0 and not reportMode then
     reportMode = true
-    timer:stop()
-    timer:close()
+    if timer and timer.stop then
+      timer:stop()
+    end
+    if timer and timer.close then
+      timer:close()
+    end
     reportTimer = vim.uv.new_timer()
     reportTimer:start(100, reportTime, vim.schedule_wrap(notifyTimes))
   end
