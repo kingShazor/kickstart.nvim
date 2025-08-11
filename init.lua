@@ -194,6 +194,33 @@ vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' }
 -- vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
 -- vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
 
+-- next = boolean
+local nextFunc = function(next)
+  for _, win in ipairs(vim.api.nvim_list_wins()) do
+    local info = vim.fn.getwininfo(win)[1]
+    if info.quickfix == 1 then
+      if info.loclist == 1 then
+        return next and 'lnext' or 'lprev'
+      else
+        return next and 'cnext' or 'cprev'
+      end
+    end
+  end
+  -- gibt eine Fehlermeldung
+  --return vim.notify('Either a quickfix nor a locallist open!', vim.log.levels.ERROR)
+  return 'echo "Neither a quickfix nor a locallist open!"'
+end
+
+local pNextFunc = function(cmd)
+  local ok = pcall(function()
+    vim.cmd(cmd)
+  end)
+
+  if not ok then
+    vim.notify('Ende der List erreicht!', vim.log.levels.info)
+  end
+end
+
 -- Keybinds to make split navigation easier.
 --  Use CTRL+<hjkl> to switch between windows
 --
@@ -202,8 +229,12 @@ vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left wind
 vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
-vim.keymap.set('n', '<M-j>', '<cmd>lnext<CR>', { desc = 'jump to next local list entry' })
-vim.keymap.set('n', '<M-k>', '<cmd>lprev<CR>', { desc = 'jump to prev local list entry' })
+vim.keymap.set('n', '<M-j>', function()
+  pNextFunc(nextFunc(true))
+end, { desc = 'jump to next local list entry' })
+vim.keymap.set('n', '<M-k>', function()
+  pNextFunc(nextFunc(false))
+end, { desc = 'jump to prev local list entry' })
 
 if not vim.g.vscode then
   vim.keymap.set('n', '-', '<CMD>Oil<CR>', { desc = 'Open parent directory' })
