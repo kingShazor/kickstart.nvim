@@ -420,7 +420,28 @@ require('lazy').setup({
     branch = 'harpoon2',
     dependencies = { 'nvim-lua/plenary.nvim' },
   },
-
+  {
+    'zbirenbaum/copilot.lua',
+    cmd = 'Copilot',
+    event = 'VimEnter',
+    init = function()
+      -- Keymap immer setzen, auch wenn Plugin noch nicht geladen ist
+      vim.keymap.set({ 'n', 'i' }, '<leader>c', function()
+        -- Plugin lazy laden und dann toggle ausführen
+        require('lazy').load { plugins = { 'copilot.lua' } }
+        require('copilot.suggestion').toggle_auto_trigger()
+      end, { desc = 'Toggle Copilot Auto-Trigger' })
+    end,
+    config = function()
+      require('copilot').setup {
+        keymap = {
+          jump_prev = 'ÖÖ',
+          jump_next = 'öö',
+          refresh = '<leader>r',
+        },
+      }
+    end,
+  },
   -- NOTE: Plugins can also be configured to run Lua code when they are loaded.
   --
   -- This is often very useful to both group configuration, as well as handle
@@ -722,7 +743,7 @@ require('lazy').setup({
   {
     'saghen/blink.cmp',
     -- optional: provides snippets for the snippet source
-    dependencies = { 'rafamadriz/friendly-snippets' },
+    dependencies = { 'rafamadriz/friendly-snippets', 'fang2hou/blink-copilot' },
 
     -- use a release tag to download pre-built binaries
     version = '1.*',
@@ -756,13 +777,20 @@ require('lazy').setup({
       },
 
       -- (Default) Only show the documentation popup when manually triggered
-      completion = { documentation = { auto_show = false } },
+      completion = { documentation = { auto_show = true } },
       -- Default list of enabled providers defined so that you can extend it
       -- elsewhere in your config, without redefining it, due to `opts_extend`
       sources = {
-        default = { 'lsp', 'path', 'snippets', 'buffer' },
+        default = { 'lsp', 'path', 'snippets', 'buffer', 'copilot' },
+        providers = {
+          copilot = {
+            name = 'copilot',
+            module = 'blink-copilot',
+            score_offset = 100,
+            async = true,
+          },
+        },
       },
-
       -- (Default) Rust fuzzy matcher for typo resistance and significantly better performance
       -- You may use a lua implementation instead by using `implementation = "lua"` or fallback to the lua implementation,
       -- when the Rust fuzzy matcher is not available, by using `implementation = "prefer_rust"`
