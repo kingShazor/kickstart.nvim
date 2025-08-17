@@ -251,7 +251,7 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   desc = 'Highlight when yanking (copying) text',
   group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
   callback = function()
-    vim.highlight.on_yank()
+    vim.hl.on_yank()
   end,
 })
 vim.api.nvim_create_autocmd('CmdlineEnter', {
@@ -317,7 +317,7 @@ vim.lsp.enable { 'clangd', 'luals' }
 vim.api.nvim_create_autocmd('LspAttach', {
   callback = function(args)
     local client = vim.lsp.get_client_by_id(args.data.client_id)
-    if client and client.supports_method 'textDocument/documentHighlight' then
+    if client and client:supports_method 'textDocument/documentHighlight' then
       vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
         buffer = args.buf,
         callback = function()
@@ -416,6 +416,10 @@ require('lazy').setup({
     'zbirenbaum/copilot.lua',
     cmd = 'Copilot',
     event = 'VimEnter',
+    cond = function()
+      local filename = '~/.config/github-copilot/apps.json'
+      return vim.fn.filereadable(filename) == 1
+    end,
     init = function()
       -- Keymap immer setzen, auch wenn Plugin noch nicht geladen ist
       vim.keymap.set({ 'n', 'i' }, '<leader>c', function()
@@ -738,9 +742,10 @@ require('lazy').setup({
     dependencies = { 'rafamadriz/friendly-snippets', 'fang2hou/blink-copilot' },
 
     -- use a release tag to download pre-built binaries
+    --build = 'cargo +nightly build --release',
     version = '1.*',
     -- AND/OR build from source, requires nightly: https://rust-lang.github.io/rustup/concepts/channels.html#working-with-nightly-rust
-    -- build = 'cargo build --release',
+    --build = 'cargo build --release',
     -- If you use nix, you can build from source using latest nightly rust with:
     -- build = 'nix run .#build-plugin',
 
@@ -908,11 +913,11 @@ require('lazy').setup({
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
-        dependencies = {
-          {
-            'nvim-treesitter/nvim-treesitter-textobjects',
-          },
-        },
+    dependencies = {
+      {
+        'nvim-treesitter/nvim-treesitter-textobjects',
+      },
+    },
     opts = {
       ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc' },
       -- Autoinstall languages that are not installed
