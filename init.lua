@@ -429,10 +429,18 @@ require('lazy').setup({
     end,
     config = function()
       require('copilot').setup {
+        panel = {
+          keymap = {
+            open = '<M-ö>',
+            jump_prev = 'ÖÖ',
+            jump_next = 'öö',
+          },
+        },
+
         suggestion = {
           auto_trigger = true,
           keymap = {
-            accept = '<leader>i',
+            accept = '<leader><CR>',
             next = '<leader>ö',
             prev = '<leader>ü',
             dismiss = '<leader>ä',
@@ -745,8 +753,6 @@ require('lazy').setup({
   {
     'saghen/blink.cmp',
     -- optional: provides snippets for the snippet source
-    dependencies = { 'rafamadriz/friendly-snippets' },
-
     -- use a release tag to download pre-built binaries
     --build = 'cargo +nightly build --release',
     version = '1.*',
