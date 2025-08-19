@@ -434,6 +434,7 @@ require('lazy').setup({
           jump_prev = 'ÖÖ',
           jump_next = 'öö',
           refresh = '<leader>r',
+          },
         },
       }
     end,
