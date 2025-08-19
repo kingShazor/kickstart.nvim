@@ -337,7 +337,6 @@ vim.api.nvim_create_autocmd('LspAttach', {
     end
   end,
 })
-
 -- [[ Configure and install plugins ]]
 --
 --  To check the current status of your plugins, run
@@ -417,23 +416,29 @@ require('lazy').setup({
     cmd = 'Copilot',
     event = 'VimEnter',
     cond = function()
-      local filename = '~/.config/github-copilot/apps.json'
+      local filename = vim.fn.expand '~/.config/github-copilot/apps.json'
       return vim.fn.filereadable(filename) == 1
     end,
     init = function()
       -- Keymap immer setzen, auch wenn Plugin noch nicht geladen ist
-      vim.keymap.set({ 'n', 'i' }, '<leader>c', function()
+      vim.keymap.set({ 'n', 'i' }, '<M-a>', function()
         -- Plugin lazy laden und dann toggle ausführen
-        require('lazy').load { plugins = { 'copilot.lua' } }
+        -- require('lazy').load { plugins = { 'copilot.lua' } }
         require('copilot.suggestion').toggle_auto_trigger()
       end, { desc = 'Toggle Copilot Auto-Trigger' })
     end,
     config = function()
       require('copilot').setup {
-        keymap = {
-          jump_prev = 'ÖÖ',
-          jump_next = 'öö',
-          refresh = '<leader>r',
+        suggestion = {
+          auto_trigger = true,
+          keymap = {
+            accept = '<leader>i',
+            next = '<leader>ö',
+            prev = '<leader>ü',
+            dismiss = '<leader>ä',
+            -- jump_prev = 'ÖÖ',
+            -- jump_next = 'öö',
+            -- refresh = '<leader>r',
           },
         },
       }
@@ -740,7 +745,7 @@ require('lazy').setup({
   {
     'saghen/blink.cmp',
     -- optional: provides snippets for the snippet source
-    dependencies = { 'rafamadriz/friendly-snippets', 'fang2hou/blink-copilot' },
+    dependencies = { 'rafamadriz/friendly-snippets' },
 
     -- use a release tag to download pre-built binaries
     --build = 'cargo +nightly build --release',
@@ -779,15 +784,7 @@ require('lazy').setup({
       -- Default list of enabled providers defined so that you can extend it
       -- elsewhere in your config, without redefining it, due to `opts_extend`
       sources = {
-        default = { 'lsp', 'path', 'snippets', 'buffer', 'copilot' },
-        providers = {
-          copilot = {
-            name = 'copilot',
-            module = 'blink-copilot',
-            score_offset = 100,
-            async = true,
-          },
-        },
+        default = { 'lsp', 'path', 'snippets', 'buffer' },
       },
       -- (Default) Rust fuzzy matcher for typo resistance and significantly better performance
       -- You may use a lua implementation instead by using `implementation = "lua"` or fallback to the lua implementation,
