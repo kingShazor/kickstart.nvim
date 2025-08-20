@@ -422,8 +422,6 @@ require('lazy').setup({
     init = function()
       -- Keymap immer setzen, auch wenn Plugin noch nicht geladen ist
       vim.keymap.set({ 'n', 'i' }, '<M-a>', function()
-        -- Plugin lazy laden und dann toggle ausführen
-        -- require('lazy').load { plugins = { 'copilot.lua' } }
         require('copilot.suggestion').toggle_auto_trigger()
       end, { desc = 'Toggle Copilot Auto-Trigger' })
     end,
@@ -431,7 +429,7 @@ require('lazy').setup({
       require('copilot').setup {
         panel = {
           keymap = {
-            open = '<M-ö>',
+            open = '<M-+>',
             jump_prev = 'ÖÖ',
             jump_next = 'öö',
           },
@@ -440,13 +438,10 @@ require('lazy').setup({
         suggestion = {
           auto_trigger = true,
           keymap = {
-            accept = '<leader><CR>',
-            next = '<leader>ö',
-            prev = '<leader>ü',
-            dismiss = '<leader>ä',
-            -- jump_prev = 'ÖÖ',
-            -- jump_next = 'öö',
-            -- refresh = '<leader>r',
+            accept = '<Tab>',
+            next = '<M-ö>',
+            prev = '<M-ü>',
+            dismiss = '<M-ä>',
           },
         },
       }
@@ -786,7 +781,10 @@ require('lazy').setup({
       },
 
       -- (Default) Only show the documentation popup when manually triggered
-      completion = { documentation = { auto_show = true } },
+      completion = {
+        menu = { auto_show = false },
+        documentation = { auto_show = true },
+      },
       -- Default list of enabled providers defined so that you can extend it
       -- elsewhere in your config, without redefining it, due to `opts_extend`
       sources = {
