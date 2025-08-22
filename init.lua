@@ -194,6 +194,48 @@ vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' }
 -- vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
 -- vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
 
+-- method - string
+local function call_hierarchy(method)
+  local clients = vim.lsp.get_clients { bufnr = 0 }
+  local param = vim.lsp.util.make_position_params(0, clients[1].offset_encoding or 'utf-8')
+  vim.lsp.buf_request(0, 'textDocument/prepareCallHierarchy', param, function(err, result, ctx, _)
+    if err or not result or vim.tbl_isempty(result) then
+      vim.notify('No call hierarchy found', vim.log.levels.info)
+      return
+    end
+
+    local item = result[1]
+
+    vim.notify(string.format('call %s', method), vim.log.levels.info)
+    vim.lsp.buf_request(ctx.bufnr, method, { item = item }, function(errStack, resultStack, _, _)
+      if errStack or not resultStack then
+        return
+      end
+      local items = {}
+      for _, call in ipairs(resultStack) do
+        local loc = call.from and call.from.range
+        if loc then
+          table.insert(items, {
+            filename = vim.uri_to_fname(call.from.uri),
+            lnum = loc.start.line + 1,
+            col = loc.start.character + 1,
+            text = call.from.name,
+          })
+        end
+      end
+      vim.fn.setloclist(0, {}, ' ', { title = 'LSP Call Hierarchy', items = items })
+      vim.cmd 'lopen'
+    end)
+  end)
+end
+
+vim.keymap.set('n', 'gk', function()
+  vim.lsp.buf.incoming_calls()
+end, { desc = 'Incoming Calls to loclist)' })
+vim.keymap.set('n', 'gj', function()
+  call_hierarchy 'callHierarchy/outgoingCalls'
+end, { desc = 'Incoming Calls loclist' })
+
 -- next = boolean
 local nextFunc = function(next)
   for _, win in ipairs(vim.api.nvim_list_wins()) do
@@ -438,7 +480,7 @@ require('lazy').setup({
         suggestion = {
           auto_trigger = true,
           keymap = {
-            accept = '<Tab>',
+            accept = '<C-l>',
             next = '<M-ö>',
             prev = '<M-ü>',
             dismiss = '<M-ä>',
