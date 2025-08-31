@@ -143,7 +143,7 @@ vim.opt.splitbelow = true
 --  See `:help 'list'`
 --  and `:help 'listchars'`
 vim.opt.list = true
-vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
+vim.opt.listchars = { tab = '  ', trail = '·', nbsp = '␣' }
 
 -- Preview substitutions live, as you type!
 vim.opt.inccommand = 'split'
@@ -197,7 +197,8 @@ vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' }
 -- method - string
 local function call_hierarchy(method)
   local clients = vim.lsp.get_clients { bufnr = 0 }
-  local param = vim.lsp.util.make_position_params(0, clients[1].offset_encoding or 'utf-8')
+  local encoding = clients[1].offset_encoding or 'utf-8'
+  local param = vim.lsp.util.make_position_params(0, encoding)
   vim.lsp.buf_request(0, 'textDocument/prepareCallHierarchy', param, function(err, result, ctx, _)
     if err or not result or vim.tbl_isempty(result) then
       vim.notify('No call hierarchy found', vim.log.levels.info)
@@ -206,35 +207,38 @@ local function call_hierarchy(method)
 
     local item = result[1]
 
-    vim.notify(string.format('call %s', method), vim.log.levels.info)
+    --vim.notify(string.format('call %s', method), vim.log.levels.info)
     vim.lsp.buf_request(ctx.bufnr, method, { item = item }, function(errStack, resultStack, _, _)
       if errStack or not resultStack then
         return
       end
+      vim.notify(vim.inspect(resultStack))
       local items = {}
       for _, call in ipairs(resultStack) do
         local loc = call.from and call.from.range
         if loc then
-          table.insert(items, {
-            filename = vim.uri_to_fname(call.from.uri),
-            lnum = loc.start.line + 1,
-            col = loc.start.character + 1,
-            text = call.from.name,
-          })
+          local nextItem = {
+            uri = call.from.uri,
+            range = call.fromRanges and call.fromRanges[1] or call.from.range,
+            --            lnum = loc.start.line + 1,
+            --            col = loc.start.character + 1,
+            --            text = call.from.name,
+          }
+          vim.notify(string.format('got item: %s', nextItem.uri), vim.log.levels.info)
+          vim.lsp.util.show_document(nextItem, encoding, { focus = true })
         end
       end
-      vim.fn.setloclist(0, {}, ' ', { title = 'LSP Call Hierarchy', items = items })
-      vim.cmd 'lopen'
     end)
   end)
 end
 
 vim.keymap.set('n', 'gk', function()
-  vim.lsp.buf.incoming_calls()
-end, { desc = 'Incoming Calls to loclist)' })
+  call_hierarchy 'callHierarchy/incomingCalls'
+  --vim.lsp.buf.incoming_calls()
+end, { desc = 'pick first calling reference)' })
 vim.keymap.set('n', 'gj', function()
   call_hierarchy 'callHierarchy/outgoingCalls'
-end, { desc = 'Incoming Calls loclist' })
+end, { desc = 'pick first reference call' })
 
 -- next = boolean
 local nextFunc = function(next)
@@ -777,6 +781,7 @@ require('lazy').setup({
       end,
       formatters_by_ft = {
         lua = { 'stylua' },
+        go = { 'gofumpt' },
         -- Conform can also run multiple formatters sequentially
         -- python = { "isort", "black" },
         --
