@@ -1,89 +1,3 @@
---[[
-
-=====================================================================
-==================== READ THIS BEFORE CONTINUING ====================
-=====================================================================
-========                                    .-----.          ========
-========         .----------------------.   | === |          ========
-========         |.-""""""""""""""""""-.|   |-----|          ========
-========         ||                    ||   | === |          ========
-========         ||   KICKSTART.NVIM   ||   |-----|          ========
-========         ||                    ||   | === |          ========
-========         ||                    ||   |-----|          ========
-========         ||:Tutor              ||   |:::::|          ========
-========         |'-..................-'|   |____o|          ========
-========         `"")----------------(""`   ___________      ========
-========        /::::::::::|  |::::::::::\  \ no mouse \     ========
-========       /:::========|  |==hjkl==:::\  \ required \    ========
-========      '""""""""""""'  '""""""""""""'  '""""""""""'   ========
-========                                                     ========
-=====================================================================
-=====================================================================
-
-What is Kickstart?
-
-  Kickstart.nvim is *not* a distribution.
-
-  Kickstart.nvim is a starting point for your own configuration.
-    The goal is that you can read every line of code, top-to-bottom, understand
-    what your configuration is doing, and modify it to suit your needs.
-
-    Once you've done that, you can start exploring, configuring and tinkering to
-    make Neovim your own! That might mean leaving Kickstart just the way it is for a while
-    or immediately breaking it into modular pieces. It's up to you!
-
-    If you don't know anything about Lua, I recommend taking some time to read through
-    a guide. One possible example which will only take 10-15 minutes:
-      - https://learnxinyminutes.com/docs/lua/
-
-    After understanding a bit more about Lua, you can use `:help lua-guide` as a
-    reference for how Neovim integrates Lua.
-    - :help lua-guide
-    - (or HTML version): https://neovim.io/doc/user/lua-guide.html
-
-Kickstart Guide:
-
-  TODO: The very first thing you should do is to run the command `:Tutor` in Neovim.
-
-    If you don't know what this means, type the following:
-      - <escape key>
-      - :
-      - Tutor
-      - <enter key>
-
-    (If you already know the Neovim basics, you can skip this step.)
-
-  Once you've completed that, you can continue working through **AND READING** the rest
-  of the kickstart init.lua.
-
-  Next, run AND READ `:help`.
-    This will open up a help window with some basic information
-    about reading, navigating and searching the builtin help documentation.
-
-    This should be the first place you go to look when you're stuck or confused
-    with something. It's one of my favorite Neovim features.
-
-    MOST IMPORTANTLY, we provide a keymap "<space>sh" to [s]earch the [h]elp documentation,
-    which is very useful when you're not exactly sure of what you're looking for.
-
-  I have left several `:help X` comments throughout the init.lua
-    These are hints about where to find more information about the relevant settings,
-    plugins or Neovim features used in Kickstart.
-
-   NOTE: Look for lines like this
-
-    Throughout the file. These are for you, the reader, to help you understand what is happening.
-    Feel free to delete them once you know what you're doing, but they should serve as a guide
-    for when you are first encountering a few different constructs in your Neovim config.
-
-If you experience any errors while trying to install kickstart, run `:checkhealth` for more info.
-
-I hope you enjoy your Neovim journey,
-- TJ
-
-P.S. You can delete this when you're done too. It's your config now! :)
---]]
-
 -- Set <space> as the leader key
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
@@ -195,50 +109,18 @@ vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' }
 -- vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
 
 -- method - string
-local function call_hierarchy(method)
-  local clients = vim.lsp.get_clients { bufnr = 0 }
-  local encoding = clients[1].offset_encoding or 'utf-8'
-  local param = vim.lsp.util.make_position_params(0, encoding)
-  vim.lsp.buf_request(0, 'textDocument/prepareCallHierarchy', param, function(err, result, ctx, _)
-    if err or not result or vim.tbl_isempty(result) then
-      vim.notify('No call hierarchy found', vim.log.levels.info)
-      return
-    end
 
-    local item = result[1]
-
-    --vim.notify(string.format('call %s', method), vim.log.levels.info)
-    vim.lsp.buf_request(ctx.bufnr, method, { item = item }, function(errStack, resultStack, _, _)
-      if errStack or not resultStack then
-        return
-      end
-      vim.notify(vim.inspect(resultStack))
-      local items = {}
-      for _, call in ipairs(resultStack) do
-        local loc = call.from and call.from.range
-        if loc then
-          local nextItem = {
-            uri = call.from.uri,
-            range = call.fromRanges and call.fromRanges[1] or call.from.range,
-            --            lnum = loc.start.line + 1,
-            --            col = loc.start.character + 1,
-            --            text = call.from.name,
-          }
-          vim.notify(string.format('got item: %s', nextItem.uri), vim.log.levels.info)
-          vim.lsp.util.show_document(nextItem, encoding, { focus = true })
-        end
-      end
-    end)
-  end)
-end
+vim.keymap.set('n', 'gj', function()
+  require('utils').jump_back()
+end, { desc = 'go back to jump start' })
 
 vim.keymap.set('n', 'gk', function()
-  call_hierarchy 'callHierarchy/incomingCalls'
-  --vim.lsp.buf.incoming_calls()
-end, { desc = 'pick first calling reference)' })
-vim.keymap.set('n', 'gj', function()
-  call_hierarchy 'callHierarchy/outgoingCalls'
-end, { desc = 'pick first reference call' })
+  require('utils').jump_to_function_name(true, true)
+end, { desc = 'pick to first caller' })
+
+vim.keymap.set('n', 'gö', function()
+  require('utils').jump_to_function_name()
+end, { desc = 'jump to function name' })
 
 -- next = boolean
 local nextFunc = function(next)
@@ -1098,29 +980,10 @@ map('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
 --  For example, in C this would take you to the header.
 map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
 -- Global nutzbar machen
-function ClangdSwitchSourceHeader()
-  local bufnr = vim.api.nvim_get_current_buf()
-  local method = 'textDocument/switchSourceHeader'
-  local client = vim.lsp.get_clients({ bufnr = bufnr, name = 'clangd' })[1]
-  if not client then
-    return vim.notify(('Method %s not supported by active LSP client.'):format(method), vim.log.levels.ERROR)
-  end
 
-  local params = vim.lsp.util.make_text_document_params(bufnr)
-  client.request(method, params, function(err, result)
-    if err then
-      vim.notify('Error switching source/header: ' .. err.message, vim.log.levels.ERROR)
-      return
-    end
-    if not result then
-      vim.notify 'No corresponding file found (source/header switch failed).'
-      return
-    end
-    vim.cmd('edit ' .. vim.uri_to_fname(result))
-  end, bufnr)
-end
-
-map('<leader><Tab>', ClangdSwitchSourceHeader, 'switch between source and header')
+map('<leader><Tab>', function()
+  require('utils').ClangdSwitchSourceHeader()
+end, 'switch between source and header')
 vim.api.nvim_set_hl(0, 'MiniCursorword', { bg = '#5a4a2f', underline = false })
 vim.api.nvim_set_hl(0, 'MiniCursorwordCurrent', { bg = '#5f875f', bold = true })
 
