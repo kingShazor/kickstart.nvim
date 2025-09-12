@@ -122,6 +122,10 @@ vim.keymap.set('n', 'gö', function()
   require('utils').jump_to_function_name()
 end, { desc = 'jump to function name' })
 
+vim.keymap.set('n', 'gl', function()
+  vim.lsp.buf.incoming_calls()
+end, { desc = 'pick to first caller' })
+
 -- next = boolean
 local nextFunc = function(next)
   for _, win in ipairs(vim.api.nvim_list_wins()) do
@@ -352,6 +356,9 @@ require('lazy').setup({
       vim.keymap.set({ 'n', 'i' }, '<M-a>', function()
         require('copilot.suggestion').toggle_auto_trigger()
       end, { desc = 'Toggle Copilot Auto-Trigger' })
+      vim.keymap.set({ 'v' }, '<M-+>', function()
+        require('copilot.panel').open()
+      end, { desc = 'Open Copilot Panel' })
     end,
     config = function()
       require('copilot').setup {
@@ -364,7 +371,7 @@ require('lazy').setup({
         },
 
         suggestion = {
-          auto_trigger = true,
+          auto_trigger = false,
           keymap = {
             accept = '<C-l>',
             next = '<M-ö>',
@@ -850,7 +857,7 @@ require('lazy').setup({
       },
     },
     opts = {
-      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc' },
+      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc', 'gitcommit' },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
