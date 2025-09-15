@@ -85,10 +85,20 @@ vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous [D]
 vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next [D]iagnostic message' })
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Show diagnostic [E]rror messages' })
 vim.keymap.set('n', '<leader>x', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
-
 vim.keymap.set('n', '<leader>w', ':write<CR>', { desc = '[w]rite buffer' })
 vim.keymap.set('n', '<leader>q', ':quit<CR>', { desc = '[q]uit nvim' })
 vim.keymap.set('n', '<leader>R', ':update<CR> :source<CR>', { desc = 'Source files' })
+-- vim.keymap.set('n', '<CR>', function()
+--   local line = ""
+--   local lines = vim.api.nvim_buf_get_lines(0)
+--   local pos = vim.api.nvim_win_get_cursor(0)
+--
+--   for i
+--
+--
+--
+--   vim.notify(string.format('sql command: %s', line), vim.log.levels.info)
+-- end, { desc = 'Exec SQL Command' })
 
 -- Shift+C für Visual Block Mode
 vim.keymap.set('n', '<v', '<c-v>', { desc = 'block mode' })
@@ -565,6 +575,9 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
       vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
       vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
+      vim.keymap.set('n', '<leader>sl', function()
+        builtin.find_files { cwd = vim.fn.expand '~/db' }
+      end, { desc = 'Find [S]q[L] files' })
       vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
       vim.keymap.set('n', '<leader>o', 'o<Esc>k', { desc = '[ o] Insert line under curser' })
       vim.keymap.set('n', '<leader>O', 'O<Esc>j', { desc = '[ o] Insert line above curser' })
