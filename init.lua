@@ -89,41 +89,7 @@ vim.keymap.set('n', '<leader>w', ':write<CR>', { desc = '[w]rite buffer' })
 vim.keymap.set('n', '<leader>q', ':quit<CR>', { desc = '[q]uit nvim' })
 vim.keymap.set('n', '<leader>R', ':update<CR> :source<CR>', { desc = 'Source files' })
 vim.keymap.set('n', '<CR>', function()
-  local cmd = ''
-  local lines = vim.api.nvim_buf_get_lines(0, 0, -1, true)
-  local linepos = vim.api.nvim_win_get_cursor(0)[1]
-
-  -- take hole prev lines without ';'
-  for i = linepos - 1, 1, -1 do
-    local pos = string.find(lines[i], ';')
-    if pos ~= nil then
-      break
-    end
-    cmd = lines[i] .. cmd
-  end
-
-  -- take hole lines  - last is with ';'
-  for i = linepos, #lines do
-    local pos = string.find(lines[i], ';')
-    cmd = cmd .. lines[i]
-    if pos ~= nil then
-      break
-    end
-  end
-
-  vim.notify(string.format('sql command: %s', cmd), vim.log.levels.info)
-
-  local outpath = vim.fn.expand '~/db/out.txt'
-  vim.system({ 'usql', 'oracle://kbase:kbase@localhost:1621/BUSTER', '-o', outpath, '-c', cmd }):wait()
-
-  for _, win in ipairs(vim.api.nvim_list_wins()) do
-    local buf = vim.api.nvim_win_get_buf(win)
-    if vim.api.nvim_buf_get_name(buf) == outpath then
-      vim.api.nvim_win_close(win, true)
-    end
-  end
-  vim.cmd('split ' .. outpath)
-  vim.wo.wrap = false
+  require('sql').exec_sql()
 end, { desc = 'Exec SQL Command' })
 
 -- Shift+C für Visual Block Mode
