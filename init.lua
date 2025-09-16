@@ -88,17 +88,34 @@ vim.keymap.set('n', '<leader>x', vim.diagnostic.setloclist, { desc = 'Open diagn
 vim.keymap.set('n', '<leader>w', ':write<CR>', { desc = '[w]rite buffer' })
 vim.keymap.set('n', '<leader>q', ':quit<CR>', { desc = '[q]uit nvim' })
 vim.keymap.set('n', '<leader>R', ':update<CR> :source<CR>', { desc = 'Source files' })
--- vim.keymap.set('n', '<CR>', function()
---   local line = ""
---   local lines = vim.api.nvim_buf_get_lines(0)
---   local pos = vim.api.nvim_win_get_cursor(0)
---
---   for i
---
---
---
---   vim.notify(string.format('sql command: %s', line), vim.log.levels.info)
--- end, { desc = 'Exec SQL Command' })
+vim.keymap.set('n', '<CR>', function()
+  local cmd = ''
+  local lines = vim.api.nvim_buf_get_lines(0, 0, -1, true)
+  local linepos = vim.api.nvim_win_get_cursor(0)[1]
+
+  -- take hole prev lines without ';'
+  for i = linepos - 1, 1, -1 do
+    local pos = string.find(lines[i], ';')
+    if pos ~= nil then
+      break
+    end
+    cmd = lines[i] .. cmd
+  end
+
+  -- take hole lines  - last is with ';'
+  for i = linepos, #lines do
+    local pos = string.find(lines[i], ';')
+    cmd = cmd .. lines[i]
+    if pos ~= nil then
+      break
+    end
+  end
+
+  vim.notify(string.format('sql command: %s', cmd), vim.log.levels.info)
+
+  local outpath = vim.fn.expand '~/db/out.txt'
+  vim.system { 'usql', 'oracle://kbase:kbase@localhost:1621/BUSTER', '-o', outpath, '-c', cmd }
+end, { desc = 'Exec SQL Command' })
 
 -- Shift+C für Visual Block Mode
 vim.keymap.set('n', '<v', '<c-v>', { desc = 'block mode' })
@@ -201,6 +218,7 @@ vim.api.nvim_create_autocmd('CmdlineEnter', {
     require('notify').dismiss { silent = true, pending = true }
   end,
 })
+
 -- [[ Install `lazy.nvim` plugin manager ]]
 --    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
@@ -237,7 +255,14 @@ vim.lsp.config.luals = {
       runtime = {
         version = 'LuaJIT',
       },
+      diagnostics = {
+        -- Erlaubt globale `vim` Variable
+        globals = { 'vim' },
+      },
     },
+  },
+  workspace = {
+    library = vim.api.nvim_get_runtime_file('', true),
   },
 }
 vim.lsp.enable { 'clangd', 'luals' }
@@ -576,7 +601,7 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
       vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
       vim.keymap.set('n', '<leader>sl', function()
-        builtin.find_files { cwd = vim.fn.expand '~/db' }
+        builtin.find_files { cwd = vim.fn.expand '~/db', search_file = '*.sql' }
       end, { desc = 'Find [S]q[L] files' })
       vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
       vim.keymap.set('n', '<leader>o', 'o<Esc>k', { desc = '[ o] Insert line under curser' })
