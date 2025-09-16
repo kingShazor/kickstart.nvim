@@ -114,7 +114,16 @@ vim.keymap.set('n', '<CR>', function()
   vim.notify(string.format('sql command: %s', cmd), vim.log.levels.info)
 
   local outpath = vim.fn.expand '~/db/out.txt'
-  vim.system { 'usql', 'oracle://kbase:kbase@localhost:1621/BUSTER', '-o', outpath, '-c', cmd }
+  vim.system({ 'usql', 'oracle://kbase:kbase@localhost:1621/BUSTER', '-o', outpath, '-c', cmd }):wait()
+
+  for _, win in ipairs(vim.api.nvim_list_wins()) do
+    local buf = vim.api.nvim_win_get_buf(win)
+    if vim.api.nvim_buf_get_name(buf) == outpath then
+      vim.api.nvim_win_close(win, true)
+    end
+  end
+  vim.cmd('split ' .. outpath)
+  vim.wo.wrap = false
 end, { desc = 'Exec SQL Command' })
 
 -- Shift+C für Visual Block Mode
