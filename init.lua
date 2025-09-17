@@ -88,9 +88,6 @@ vim.keymap.set('n', '<leader>x', vim.diagnostic.setloclist, { desc = 'Open diagn
 vim.keymap.set('n', '<leader>w', ':write<CR>', { desc = '[w]rite buffer' })
 vim.keymap.set('n', '<leader>q', ':quit<CR>', { desc = '[q]uit nvim' })
 vim.keymap.set('n', '<leader>R', ':update<CR> :source<CR>', { desc = 'Source files' })
-vim.keymap.set('n', '<CR>', function()
-  require('sql').exec_sql()
-end, { desc = 'Exec SQL Command' })
 
 -- Shift+C für Visual Block Mode
 vim.keymap.set('n', '<v', '<c-v>', { desc = 'block mode' })
@@ -191,6 +188,15 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 vim.api.nvim_create_autocmd('CmdlineEnter', {
   callback = function()
     require('notify').dismiss { silent = true, pending = true }
+  end,
+})
+
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'sql',
+  callback = function()
+    vim.keymap.set('n', '<CR>', function()
+      require('sql').exec_sql()
+    end, { desc = 'Exec SQL Command' })
   end,
 })
 
