@@ -46,7 +46,7 @@ M = {
     vim.cmd('split ' .. outpath)
     vim.wo.wrap = false
 
-    vim.notify(string.format('sql function hole time: %.1f ms', (vim.uv.hrtime() - start) / 1e6), vim.log.levels.info)
+    vim.notify(string.format('sql function time: %.1f ms', (vim.uv.hrtime() - start) / 1e6), vim.log.levels.info)
   end,
 }
 return M
