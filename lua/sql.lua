@@ -1,6 +1,14 @@
 M = {
+  outpath = vim.fn.expand '~/db/out.txt',
+
+  databases = {
+    [vim.fn.expand '~/db/oracle.sql'] = 'oracle://kbase:kbase@localhost:1621/BUSTER',
+    [vim.fn.expand '~/db/postgres.sql'] = 'usql postgres://kbase:kbase@localhost:2345/postgres',
+    [vim.fn.expand '~/db/postgres_test.sql'] = 'postgres://postgres@localhost:5432/dvdrental',
+  },
+
   exec_sql = function()
-    local start = vim.uv.hrtime()
+    -- local start = vim.uv.hrtime()
     local cmd = ''
     local lines = vim.api.nvim_buf_get_lines(0, 0, -1, true)
     local linepos = vim.api.nvim_win_get_cursor(0)[1]
@@ -23,10 +31,14 @@ M = {
       end
     end
 
-    local outpath = vim.fn.expand '~/db/out.txt'
-    local uri = vim.api.nvim_buf_get_name(0) == vim.fn.expand '~/db/oracle.sql' and 'oracle://kbase:kbase@localhost:1621/BUSTER'
-      or 'usql postgres://kbase:kbase@localhost:2345/postgres'
-    local res = vim.system({ 'usql', uri, '-o', outpath, '-c', cmd }):wait()
+    local bufName = vim.api.nvim_buf_get_name(0)
+    local uri = M.databases[bufName]
+    if not uri then
+      vim.notify(string.format('No database uri for file %s found!', bufName), vim.log.levels.ERROR)
+      return
+    end
+
+    local res = vim.system({ 'usql', uri, '-o', M.outpath, '-c', cmd }):wait()
 
     if not res then
       vim.notify('vim.system returned no result', vim.log.levels.ERROR)
@@ -39,14 +51,13 @@ M = {
 
     for _, win in ipairs(vim.api.nvim_list_wins()) do
       local buf = vim.api.nvim_win_get_buf(win)
-      if vim.api.nvim_buf_get_name(buf) == outpath then
+      if vim.api.nvim_buf_get_name(buf) == M.outpath then
         vim.api.nvim_win_close(win, true)
       end
     end
-    vim.cmd('split ' .. outpath)
+    vim.cmd('split ' .. M.outpath)
     vim.wo.wrap = false
-
-    vim.notify(string.format('sql function time: %.1f ms', (vim.uv.hrtime() - start) / 1e6), vim.log.levels.info)
+    --vim.notify(string.format('sql function time: %.1f ms', (vim.uv.hrtime() - start) / 1e6), vim.log.levels.info)
   end,
 }
 return M
