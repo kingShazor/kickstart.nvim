@@ -472,8 +472,6 @@ require('lazy').setup({
           return vim.fn.executable 'make' == 1
         end,
       },
-      { 'nvim-telescope/telescope-ui-select.nvim' },
-
       -- Useful for getting pretty icons, but requires a Nerd Font.
       -- { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
     },
@@ -515,24 +513,16 @@ require('lazy').setup({
         },
         pickers = {
           find_files = { path_display = { 'smart' }, hidden = true },
-          file_browser = { { cwd_to_path = true, path = '%:p:h' } },
           keymaps = { layout_config = { prompt_position = 'top' } },
           grep_string = { path_display = { 'smart' } },
           oldfiles = { path_display = { 'smart' } },
           buffers = { path_display = { 'smart' } },
           lsp_references = { path_display = { 'tail' } },
         },
-        extensions = {
-          ['ui-select'] = {
-            require('telescope.themes').get_dropdown(),
-          },
-        },
       }
 
       -- Enable Telescope extensions if they are installed
       pcall(require('telescope').load_extension, 'fzf')
-      pcall(require('telescope').load_extension, 'ui-select')
-      pcall(require('telescope').load_extension, 'file_browser')
       local harpoon = require 'harpoon'
       harpoon:setup {}
 
