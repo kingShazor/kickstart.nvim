@@ -5,6 +5,9 @@ M = {
     [vim.fn.expand '~/db/oracle.sql'] = 'oracle://kbase:kbase@localhost:1621/BUSTER',
     [vim.fn.expand '~/db/postgres.sql'] = 'usql postgres://kbase:kbase@localhost:2345/postgres',
     [vim.fn.expand '~/db/postgres_test.sql'] = 'postgres://postgres@localhost:5432/dvdrental',
+    [vim.fn.expand '~/db/oracle-docker.sql'] = 'oracle://kbase:kbase@172.23.34.4:1521/BUSTER',
+    [vim.fn.expand '~/db/postgres-2346.sql'] = 'postgres://kbase:kbase@localhost:2346/postgres',
+    [vim.fn.expand '~/db/postgres-docker-172.sql'] = 'postgres://kbase:kbase@172.23.17.4:5432/postgres',
   },
 
   exec_sql = function()
