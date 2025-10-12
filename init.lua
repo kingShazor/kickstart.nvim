@@ -711,7 +711,7 @@ require('lazy').setup({
     ---@type table oil.SetupOpts
     opts = {},
     -- Optional dependencies
-    dependencies = { { 'echasnovski/mini.nvim', opts = {} } },
+    dependencies = { { 'nvim-mini/mini.icons', opts = {} } },
     -- dependencies = { "nvim-tree/nvim-web-devicons" }, -- use if you prefer nvim-web-devicons
     -- Lazy loading is not recommended because it is very tricky to make it work correctly in all situations.
     lazy = false,
@@ -731,65 +731,49 @@ require('lazy').setup({
   --    { "<c-s>", mode = { "c" }, function() require("flash").toggle() end, desc = "Toggle Flash Search" },
   --  },
   --  },
-  { -- Collection of various small independent plugins/modules
-    'echasnovski/mini.nvim',
+  --
+  -- Better Around/Inside textobjects
+  --
+  -- Examples:
+  --  - va)  - [V]isually select [A]round [)]paren
+  --  - yinq - [Y]ank [I]nside [N]ext [']quote
+  --  - ci'  - [C]hange [I]nside [']quote
+  {
+    'nvim-mini/mini.ai',
+    version = false,
     config = function()
-      -- Better Around/Inside textobjects
-      --
-      -- Examples:
-      --  - va)  - [V]isually select [A]round [)]paren
-      --  - yinq - [Y]ank [I]nside [N]ext [']quote
-      --  - ci'  - [C]hange [I]nside [']quote
       require('mini.ai').setup { n_lines = 500 }
-
-      -- Add/delete/replace surroundings (brackets, quotes, etc.)
-      --
-      -- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
-      -- - sd'   - [S]urround [D]elete [']quotes
-      -- - sr)'  - [S]urround [R]eplace [)] [']
+    end,
+  },
+  -- Add/delete/replace surroundings (brackets, quotes, etc.)
+  --
+  -- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
+  -- - sd'   - [S]urround [D]elete [']quotes
+  -- - sr)'  - [S]urround [R]eplace [)] [']
+  {
+    'nvim-mini/mini.surround',
+    version = false,
+    config = function()
       require('mini.surround').setup()
-
-      -- Simple and easy statusline.
-      --  You could remove this setup call if you don't like it,
-      --  and try some other statusline plugin
-      local statusline = require 'mini.statusline'
-      -- set use_icons to true if you have a Nerd Font
-      statusline.setup { use_icons = vim.g.have_nerd_font }
+    end,
+  },
+  {
+    'nvim-mini/mini.icons',
+    version = false,
+    config = function()
       require('mini.icons').setup()
-      -- require('mini.cursorword').setup()
-      --    require('mini.animate').setup {
-      --      cursor = {
-      --        enable = true,
-      --        timing = require('mini.animate').gen_timing.linear { duration = 100, unit = 'total' },
-      --      },
-      --      scroll = {
-      --        enable = true,
-      --        timing = require('mini.animate').gen_timing.linear { duration = 50, unit = 'total' },
-      --      },
-      --      resize = {
-      --        enable = true,
-      --        timing = require('mini.animate').gen_timing.linear { duration = 100, unit = 'total' },
-      --      },
-      --      open = {
-      --        enable = true,
-      --        timing = require('mini.animate').gen_timing.linear { duration = 100, unit = 'total' },
-      --      },
-      --      close = {
-      --        enable = true,
-      --        timing = require('mini.animate').gen_timing.linear { duration = 100, unit = 'total' },
-      --      },
-      --    }
-      -- You can configure sections in the statusline by overriding their
-      -- default behavior. For example, here we set the section for
-      -- cursor location to LINE:COLUMN
-      ---@diagnostic disable-next-line: duplicate-set-field
+    end,
+  },
+  {
+    'nvim-mini/mini.statusline',
+    version = false,
+    config = function()
+      local statusline = require 'mini.statusline'
+      require('mini.icons').setup()
+      statusline.setup { use_icons = vim.g.have_nerd_font }
       statusline.section_location = function()
         return '%2l:%-2v'
       end
-
-      -- require('mini.files').setup()
-      -- ... and there is more!
-      --  Check out: https://github.com/echasnovski/mini.nvim
     end,
   },
   { -- Highlight, edit, and navigate code
