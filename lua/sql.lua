@@ -20,9 +20,11 @@ M = {
     local lines = vim.api.nvim_buf_get_lines(0, 0, -1, true)
     local linepos = vim.api.nvim_win_get_cursor(0)[1]
 
-    if not M.init and vim.uv.fs_stat(M.cfg_file) then
-      local connections = dofile(M.cfg_file)
-      M.databases = vim.tbl_extend('force', M.databases, connections)
+    if not M.init then
+      if vim.uv.fs_stat(M.cfg_file) then
+        local connections = dofile(M.cfg_file)
+        M.databases = vim.tbl_extend('force', M.databases, connections)
+      end
       M.init = true
     end
 
