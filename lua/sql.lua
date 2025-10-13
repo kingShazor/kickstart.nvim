@@ -10,11 +10,21 @@ M = {
     [vim.fn.expand '~/db/postgres-docker-172.sql'] = 'postgres://kbase:kbase@172.23.17.4:5432/postgres',
   },
 
+  cfg_file = vim.fn.expand '~/db/connection.lua',
+
+  init = false,
+
   exec_sql = function()
     -- local start = vim.uv.hrtime()
     local cmd = ''
     local lines = vim.api.nvim_buf_get_lines(0, 0, -1, true)
     local linepos = vim.api.nvim_win_get_cursor(0)[1]
+
+    if not M.init and vim.uv.fs_stat(M.cfg_file) then
+      local connections = dofile(M.cfg_file)
+      M.databases = vim.tbl_extend('force', M.databases, connections)
+      M.init = true
+    end
 
     -- take hole prev lines without ';'
     for i = linepos - 1, 1, -1 do
