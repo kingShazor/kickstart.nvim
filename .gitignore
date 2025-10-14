@@ -2,6 +2,8 @@ tags
 test.sh
 .luarc.json
 nvim
+lua/plugins/build/
+lua/plugins/.cache/
 
 spell/
 #lazy-lock.json

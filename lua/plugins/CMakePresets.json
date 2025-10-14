@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 3,
   "cmakeMinimumRequired": {
     "major": 3,
     "minor": 19,
@@ -11,14 +11,17 @@
       "hidden": true,
       "binaryDir": "${sourceDir}/build",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release"
+        "CMAKE_BUILD_TYPE": "Release",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
       }
     },
     {
       "name": "ninja",
       "inherits": "base",
-      "generator": "Ninja"
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_CXX_COMPILER": "clang++"
+      }
     },
     {
       "name": "make",

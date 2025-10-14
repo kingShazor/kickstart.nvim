@@ -1,8 +1,8 @@
-CFLAGS += -Wall -fpic -std=gnu99
+CXXFLAGS += -Wall -fpic -std=c++23
 
 ifeq ($(OS),Windows_NT)
-    CC = gcc
-    TARGET := libfzf.dll
+    CXX = clang++
+    TARGET := libfzs.dll
 ifeq (,$(findstring $(MSYSTEM),MSYS UCRT64 CLANG64 CLANGARM64 CLANG32 MINGW64 MINGW32))
 	# On Windows, but NOT msys/msys2
     MKD = cmd /C mkdir
@@ -12,24 +12,29 @@ else
     RM = rm -rf
 endif
 else
+    ifeq (, $(shell which clang++ 2>/dev/null))
+        CXX = g++
+    else
+        CXX = clang++
+    endif
     MKD = mkdir -p
     RM = rm -rf
-    TARGET := libfzf.so
+    TARGET := libfzs.so
 endif
 
 all: build/$(TARGET)
 
-build/$(TARGET): src/fzf.c src/fzf.h
+build/$(TARGET): src/simple_fuzzy_sorter.cpp src/simple_fuzzy_sorter.h
 	$(MKD) build
-	$(CC) -O3 $(CFLAGS) -shared src/fzf.c -o build/$(TARGET)
+	$(CXX) -O3 $(CFLAGS) -shared src/simple_fuzzy_sorter.cpp -o build/$(TARGET)
 
-build/test: build/$(TARGET) test/test.c
-	$(CC) -Og -ggdb3 $(CFLAGS) test/test.c -o build/test -I./src -L./build -lfzf -lexaminer
+# build/test: build/$(TARGET) test/test.c
+# 	$(CXX) -Og -ggdb3 $(CFLAGS) test/test.c -o build/test -I./src -L./build -lfzf -lexaminer
 
 .PHONY:
-debug: src/fzf.c src/fzf.h
+debug: src/simple_fuzzy_sorter.cpp src/simple_fuzzy_sorter.h
 	$(MKD) build
-	$(CC) -Og $(CFLAGS) -Werror -shared src/fzf.c -o build/$(TARGET)
+	$(CXX) -Og $(CXXFLAGS) -Werror -shared src/simple_fuzzy_sorter.cpp -o build/$(TARGET)
 
 # .PHONY: lint format clangdhappy clean test ntest
 # lint:
