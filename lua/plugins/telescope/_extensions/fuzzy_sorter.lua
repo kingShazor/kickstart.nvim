@@ -1,4 +1,4 @@
-local fzs = require 'fzs_lib'
+local fuzzy_sorter = require 'fzs_lib'
 local sorters = require 'telescope.sorters'
 
 -- local case_enum = setmetatable({
@@ -38,19 +38,19 @@ local get_fuzzy_sorter = function(_) --use opts
     start = nil,
     discard = true,
     scoring_function = function(_, prompt, line)
-      local score = fzs.get_score(line, prompt)
+      local score = fuzzy_sorter.get_score(line, prompt)
       if score == 0 then
         return -1
       else
         return 1 / score
       end
     end,
-    -- highlighter = function(self, prompt, display)
-    --   if self.__highlight_prefilter then
-    --     prompt = self:__highlight_prefilter(prompt)
-    --   end
-    --   return fzs.get_pos(display, prompt, self.state.slab)
-    -- end,
+    highlighter = function(self, prompt, display)
+      if self.__highlight_prefilter then
+        prompt = self:__highlight_prefilter(prompt)
+      end
+      return fuzzy_sorter.get_pos(display, prompt)
+    end,
   }
 end
 
@@ -105,9 +105,9 @@ return require('telescope').register_extension {
 
     local p = 'fzf'
 
-    eq(80, fzs.get_score('src/fzf', p))
-    eq(0, fzs.get_score('asdf', p))
-    eq(54, fzs.get_score('fasdzasdf', p))
+    eq(80, fuzzy_sorter.get_score('src/fzf', p))
+    eq(0, fuzzy_sorter.get_score('asdf', p))
+    eq(54, fuzzy_sorter.get_score('fasdzasdf', p))
 
     if good then
       ok 'lib working as expected'
