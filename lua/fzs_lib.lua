@@ -35,7 +35,7 @@ fzs.get_score = function(input, pattern)
 end
 
 fzs.dir = '~/.config/nvim/lua/plugins'
-fzs.name = 'telescope-fuzzySearcher-intro'
+fzs.name = 'fuzzy_sorter'
 fzs.lazy = false -- direkt beim Start laden
 
 fzs.get_pos = function(input, pattern)

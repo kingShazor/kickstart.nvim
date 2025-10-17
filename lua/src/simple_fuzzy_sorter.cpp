@@ -12,8 +12,38 @@ namespace
   enum
   {
     MISMATCH = 0,
-    FULL_MATCH = 100
+    FULL_MATCH = 100,
+    BOUNDARY_WORD = 2,
+    BOUNDARY_BOTH = BOUNDARY_WORD * 2,
+    CHAR_SIZE = 127,
+    U_CHAR_SIZE = 256
   };
+
+  vector< unsigned char > boundaryChars()
+  {
+    vector< unsigned char > boundaries( CHAR_SIZE, false );
+    boundaries[ '-' ] = true;
+    boundaries[ ' ' ] = true;
+    boundaries[ '(' ] = true;
+    boundaries[ ')' ] = true;
+    boundaries[ ']' ] = true;
+    boundaries[ '[' ] = true;
+    boundaries[ '.' ] = true;
+
+    return boundaries;
+  }
+
+  int scoreBoundary( const std::string &text, uint begin, uint end )
+  {
+    static const vector< unsigned char > boundary = boundaryChars();
+    int score = 0;
+    if ( begin == 0 || boundary[ text[ begin ] ] )
+      score += 2;
+    if ( end + 1 == text.size() || boundary[ text[ end ] ] )
+      score += 2;
+
+    return score;
+  }
 
   int full_match( const std::string &text, const std::string &pattern )
   {
@@ -22,8 +52,8 @@ namespace
                                  boyer_moore_horspool_searcher( pattern.begin(), pattern.end() ) );
          it != text.end() )
     {
-      std::cout << "Full match: " << text << pattern;
-      return FULL_MATCH;
+      // cout << "Full match: " << text << pattern << endl;
+      return FULL_MATCH - BOUNDARY_BOTH + scoreBoundary( text, *it, *it + pattern.size() - 1 );
     }
 
     return MISMATCH;
@@ -31,6 +61,9 @@ namespace
 
   int get_fuzzy_score( const std::string &text, const std::string &pattern )
   {
+    if ( pattern.empty() )
+      return FULL_MATCH;
+
     return full_match( text, pattern );
   }
 
@@ -45,6 +78,7 @@ namespace
   }
 } // namespace
 
+// -------- C-Interface ----------
 int fzs_get_score( const char *text, const char *pattern )
 {
   return get_fuzzy_score( text, pattern );
