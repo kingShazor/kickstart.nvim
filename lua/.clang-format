@@ -47,7 +47,8 @@ BraceWrapping:
  SplitEmptyNamespace: true
 #BracedInitializerIndentWidth: 2 # clang-format 17
 BreakAfterAttributes: Never
-BreakBeforeBinaryOperators: NonAssignment
+BreakBeforeBinaryOperators: None
+#BreakBeforeLogicalOperators: false
 BreakBeforeBraces: Custom
 BreakBeforeConceptDeclarations: Always
 BreakBeforeInlineASMColon: Never

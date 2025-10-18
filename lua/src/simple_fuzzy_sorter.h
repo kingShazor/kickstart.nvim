@@ -10,6 +10,9 @@ namespace fuzzy_score_n
     FULL_MATCH = 100,
     BOUNDARY_WORD = 2,
     BOUNDARY_BOTH = BOUNDARY_WORD * 2,
+    GAP_PENALTY = 5,
+    MAX_GAP = 2,
+    MATCH_CHAR = 10,
   };
 } // namespace fuzzy_score_n
 
@@ -24,6 +27,7 @@ extern "C"
 
   int fzs_get_score( const char *text, const char *pattern );
 
+  void set_locale( const char *locale );
   fzs_position_t *fzs_get_positions( const char *text, const char *pattern );
   void fzs_free_positions( fzs_position_t *pos );
 }
