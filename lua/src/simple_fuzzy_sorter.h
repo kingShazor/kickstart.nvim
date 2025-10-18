@@ -1,6 +1,18 @@
 #pragma once
 
 #include <sys/types.h>
+
+namespace fuzzy_score_n
+{
+  enum
+  {
+    MISMATCH = 0,
+    FULL_MATCH = 100,
+    BOUNDARY_WORD = 2,
+    BOUNDARY_BOTH = BOUNDARY_WORD * 2,
+  };
+} // namespace fuzzy_score_n
+
 extern "C"
 {
   typedef struct

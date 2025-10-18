@@ -1,17 +1,10 @@
--- M = {
---   dir = '~/.config/nvim/lua/plugins',
---   name = 'telescope-fuzzySearcher-intro',
---   lazy = false, -- direkt beim Start laden
--- }
--- return M
-
 local ffi = require 'ffi'
 local library_path = (function()
   local dirname = string.sub(debug.getinfo(1).source, 2, #'/fzs_lib.lua' * -1)
   if package.config:sub(1, 1) == '\\' then
-    return dirname .. '../build/libfzs.dll'
+    return dirname .. '../build/libfuzzy_sorter.dll'
   else
-    return dirname .. '/build/libfzs.so'
+    return dirname .. '/build/libfuzzy_sorter.so'
   end
 end)()
 local native = ffi.load(library_path)

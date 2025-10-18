@@ -2,7 +2,7 @@ CXXFLAGS += -Wall -fpic -std=c++23
 
 ifeq ($(OS),Windows_NT)
     CXX = clang++
-    TARGET := libfzs.dll
+    TARGET := libfuzzy_sorter.dll
 ifeq (,$(findstring $(MSYSTEM),MSYS UCRT64 CLANG64 CLANGARM64 CLANG32 MINGW64 MINGW32))
 	# On Windows, but NOT msys/msys2
     MKD = cmd /C mkdir
@@ -19,7 +19,7 @@ else
     endif
     MKD = mkdir -p
     RM = rm -rf
-    TARGET := libfzs.so
+    TARGET := libfuzzy_sorter.so
 endif
 
 all: build/$(TARGET)

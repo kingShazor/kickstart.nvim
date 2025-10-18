@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.19)
-project(fzs LANGUAGES CXX)
+project(fuzzy_sorter LANGUAGES CXX)
 
 add_library(${PROJECT_NAME} SHARED "src/simple_fuzzy_sorter.cpp")
 
@@ -21,13 +21,25 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     CXX_STANDARD_REQUIRED ON
     CXX_EXTENSIONS OFF
     PREFIX lib)
-# # This cannot be a generator expression in this version of CMake
-# if (NOT (MSVC OR MSYS OR MINGW OR WIN32))
-#   set_property(TARGET ${PROJECT_NAME} PROPERTY SUFFIX .so)
-# endif()
 
 if (UNIX AND NOT APPLE)
   target_compile_options(${PROJECT_NAME} PRIVATE -fPIC)
 endif()
 
 install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_BINARY_DIR})
+
+# Dein Testcode
+add_executable(fuzzy_sorter_test test/fuzzy_sorter_test.cpp)
+
+# GoogleTest einbinden
+target_link_libraries(fuzzy_sorter_test
+    PRIVATE
+        fuzzy_sorter     # deine Library
+        gtest            # GoogleTest selbst
+        gtest_main       # enthält main()
+        pthread          # erforderlich für gtest
+)
+
+# Tests aktivieren
+enable_testing()
+add_test(NAME FuzzySorterTests COMMAND fuzzy_sorter_test)

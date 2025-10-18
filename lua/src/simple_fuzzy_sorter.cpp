@@ -6,15 +6,12 @@
 #include <string>
 
 using namespace std;
+using namespace fuzzy_score_n;
 
 namespace
 {
   enum
   {
-    MISMATCH = 0,
-    FULL_MATCH = 100,
-    BOUNDARY_WORD = 2,
-    BOUNDARY_BOTH = BOUNDARY_WORD * 2,
     CHAR_SIZE = 127,
     U_CHAR_SIZE = 256
   };
@@ -33,13 +30,33 @@ namespace
     return boundaries;
   }
 
+  struct dbg
+  {
+    bool _addSep = false;
+    ~dbg() { cout << endl; }
+
+    template< class ARG >
+    dbg &operator<<( const ARG &val )
+    {
+      if ( _addSep )
+        cout << " ";
+      else
+        _addSep = true;
+
+      cout << val;
+      return *this;
+    }
+  };
+  
+
+  // end ist nach dem letzten gefunden zeichen
   int scoreBoundary( const std::string &text, uint begin, uint end )
   {
     static const vector< unsigned char > boundary = boundaryChars();
     int score = 0;
     if ( begin == 0 || boundary[ text[ begin ] ] )
       score += 2;
-    if ( end + 1 == text.size() || boundary[ text[ end ] ] )
+    if ( end == text.size() || boundary[ text[ end ] ] )
       score += 2;
 
     return score;
@@ -52,8 +69,9 @@ namespace
                                  boyer_moore_horspool_searcher( pattern.begin(), pattern.end() ) );
          it != text.end() )
     {
-      // cout << "Full match: " << text << pattern << endl;
-      return FULL_MATCH - BOUNDARY_BOTH + scoreBoundary( text, *it, *it + pattern.size() - 1 );
+      const auto pos = it - text.begin();
+      dbg() << "full match! text: " << text << "pattern:" << pattern << "index" << pos << "last:" << ( pos + pattern.size() );
+      return FULL_MATCH - BOUNDARY_BOTH + scoreBoundary( text, pos, pos + pattern.size() );
     }
 
     return MISMATCH;
