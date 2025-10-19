@@ -18,6 +18,12 @@ TEST( FuzzySorter, fuzzy_file_match )
   EXPECT_EQ( score, FULL_MATCH );
 }
 
+TEST( FuzzySorter, fuzzy_file_match_2 )
+{
+  auto score = fzs_get_score( "/home/shazor/.config/nvim/init.lua", "init" );
+  EXPECT_EQ( score, FULL_MATCH );
+}
+
 // das nächste zeichen ist kein Wortanfang (erwartet $ oder '.', '('...
 TEST( FuzzySorter, fuzzy_file_match_missing_end_bonus )
 {
@@ -76,8 +82,92 @@ TEST( FuzzySorter, fuzzy_file_upper_case_also_match )
   EXPECT_EQ( score, FULL_MATCH * 2 - BOUNDARY_WORD );
 }
 
+TEST( FuzzySorter, fuzzy_file_very_important_char_1 )
+{
+  auto score = fzs_get_score( "übertrieben.xml", "über" );
+  EXPECT_EQ( score, FULL_MATCH - BOUNDARY_WORD );
+}
+
+TEST( FuzzySorter, fuzzy_file_very_important_char_2 )
+{
+  auto score = fzs_get_score( "üBertrieben.xml", "über" );
+  EXPECT_EQ( score, FULL_MATCH - BOUNDARY_WORD );
+}
+
+// Not - Supported
+// TEST( FuzzySorter, fuzzy_file_very_important_char_3 )
+// {
+//   auto score = fzs_get_score( "Übertrieben.xml", "über" );
+//   EXPECT_EQ( score, FULL_MATCH - BOUNDARY_WORD );
+// }
+
 TEST( FuzzySorter, NoMatch )
 {
   auto score = fzs_get_score( "init.lua", "vim" );
   EXPECT_EQ( score, MISMATCH );
+}
+
+const char *poem =
+"Twinkle, twinkle, little star, "
+"How I wonder what you are! "
+"Up above the world so high, "
+"Like a diamond in the sky.";
+
+TEST( FuzzySorter, fuzzy_poem_match )
+{
+  auto score = fzs_get_score( poem, "above" );
+  EXPECT_EQ( score, FULL_MATCH );
+}
+
+TEST( FuzzySorter, fuzzy_poem_mismatch )
+{
+  auto score = fzs_get_score( poem, "alien" );
+  EXPECT_EQ( score, MISMATCH );
+}
+
+TEST( FuzzySorter, fuzzy_poem_wrd )
+{
+  auto score = fzs_get_score( poem, "wrd" );
+  EXPECT_EQ( score, 67 ); // 3 matches + 2 gaps => 20/30
+}
+
+// found text phrase are 2 words: "rld s"
+TEST( FuzzySorter, fuzzy_poem_rds )
+{
+  auto score = fzs_get_score( poem, "rds" );
+  EXPECT_EQ( score, 67 - BOUNDARY_BOTH ); // 3 matches + 2 gaps => 20/30
+}
+
+TEST( FuzzySorter, fuzzy_file_pos )
+{
+  auto posis = fzs_get_positions( "init.lua", "init" );
+  EXPECT_EQ( posis->size, 4 );
+  EXPECT_EQ( posis->data[ 0 ], 0 );
+  EXPECT_EQ( posis->data[ 1 ], 1 );
+  EXPECT_EQ( posis->data[ 2 ], 2 );
+  EXPECT_EQ( posis->data[ 3 ], 3 );
+  fzs_free_positions( posis );
+}
+
+TEST( FuzzySorter, fuzzy_file_pos_missing_both_bounds )
+{
+  auto posis = fzs_get_positions( "init.lua", "ni" );
+  EXPECT_EQ( posis->size, 2 );
+  EXPECT_EQ( posis->data[ 0 ], 1 );
+  EXPECT_EQ( posis->data[ 1 ], 2 );
+  fzs_free_positions( posis );
+}
+
+TEST( FuzzySorter, fuzzy_file_upper_case_pos )
+{
+  auto posis = fzs_get_positions( "INTEGRATION.cmake", "INT cmake" );
+  EXPECT_EQ( posis->size, 8 );
+  EXPECT_EQ( posis->data[ 0 ], 0 );
+  EXPECT_EQ( posis->data[ 1 ], 1 );
+  EXPECT_EQ( posis->data[ 2 ], 2 );
+  EXPECT_EQ( posis->data[ 3 ], 12 );
+  EXPECT_EQ( posis->data[ 4 ], 13 );
+  EXPECT_EQ( posis->data[ 5 ], 14 );
+  EXPECT_EQ( posis->data[ 6 ], 15 );
+  fzs_free_positions( posis );
 }

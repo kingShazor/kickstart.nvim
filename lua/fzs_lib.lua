@@ -13,7 +13,6 @@ ffi.cdef [[
   typedef struct {
     uint32_t *data;
     size_t size;
-    size_t cap;
   } fzs_position_t;
 
   fzs_position_t *fzs_get_positions(const char *text, const char *pattern);

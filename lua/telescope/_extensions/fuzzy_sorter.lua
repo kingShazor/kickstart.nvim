@@ -1,23 +1,7 @@
 local fuzzy_sorter = require 'fzs_lib'
 local sorters = require 'telescope.sorters'
 
--- local case_enum = setmetatable({
---   ['smart_case'] = 0,
---   ['ignore_case'] = 1,
---   ['respect_case'] = 2,
--- }, {
---   __index = function(_, k)
---     error(string.format('%s is not a valid case mode', k))
---   end,
---   __newindex = function()
---     error "Don't set new things"
---   end,
--- })
-
-local get_fuzzy_sorter = function(_) --use opts
-  -- local case_mode = case_enum[opts.case_mode]
-  -- local fuzzy_mode = opts.fuzzy == nil and true or opts.fuzzy
-
+local get_fuzzy_sorter = function(_) --todo use opts - for what?
   local clear_filter_fun = function(self, prompt)
     local filter = '^(' .. self._delimiter .. '(%S+)' .. '[' .. self._delimiter .. '%s]' .. ')'
     local matched = prompt:match(filter)
@@ -99,15 +83,15 @@ return require('telescope').register_extension {
     local good = true
     local eq = function(expected, actual)
       if tostring(expected) ~= tostring(actual) then
+        vim.notify(string.format("actual '%s' doesn't match '%s'", tostring(actual), tostring(expected)), vim.log.levels.WARNING)
         good = false
       end
     end
 
-    -- local p = 'fzf'
-    --
-    -- eq(80, fuzzy_sorter.get_score('src/fzf', p))
-    -- eq(0, fuzzy_sorter.get_score('asdf', p))
-    -- eq(54, fuzzy_sorter.get_score('fasdzasdf', p))
+    local p = 'fuzzy'
+    eq(100, fuzzy_sorter.get_score('src/fuzzy.cpp', p))
+    eq(0, fuzzy_sorter.get_score('src/strict.cpp', p))
+    eq(80, fuzzy_sorter.get_score('src/fiuzzay.h', p))
 
     if good then
       ok 'lib working as expected'
@@ -124,10 +108,11 @@ return require('telescope').register_extension {
     local test_sorter = function(name, sorter)
       good = true
       sorter:_init()
-      -- local prompt = 'fzf !lua'
-      -- eq(1 / 80, sorter:scoring_function(prompt, 'src/fzf'))
-      -- eq(-1, sorter:scoring_function(prompt, 'lua/fzf'))
-      -- eq(-1, sorter:scoring_function(prompt, 'asdf'))
+      local prompt = 'fuzzy'
+      eq(1 / 100, sorter:scoring_function(prompt, 'src/fuzzy.cpp'))
+      eq(-1, sorter:scoring_function(prompt, 'lua/fzf.lua'))
+      eq(-1, sorter:scoring_function(prompt, 'src/lazzy.h'))
+      eq(1 / 80, sorter:scoring_function(prompt, 'fiuzzay'))
       sorter:_destroy()
 
       if good then

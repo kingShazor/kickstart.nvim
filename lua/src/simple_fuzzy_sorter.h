@@ -1,11 +1,13 @@
 #pragma once
 
-#include <sys/types.h>
+#include <cstddef>
+using uint = unsigned int;
 
 namespace fuzzy_score_n
 {
   enum
   {
+    MIN_FUZZY_PATTERN_SIZE = 3,
     MISMATCH = 0,
     FULL_MATCH = 100,
     BOUNDARY_WORD = 2,
@@ -22,12 +24,9 @@ extern "C"
   {
     unsigned int *data;
     size_t size;
-    size_t cap;
   } fzs_position_t;
 
   int fzs_get_score( const char *text, const char *pattern );
-
-  void set_locale( const char *locale );
   fzs_position_t *fzs_get_positions( const char *text, const char *pattern );
   void fzs_free_positions( fzs_position_t *pos );
 }
