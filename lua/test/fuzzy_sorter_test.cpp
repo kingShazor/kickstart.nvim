@@ -72,7 +72,7 @@ TEST( FuzzySorter, fuzzy_file_very_fuzzy )
 
 TEST( FuzzySorter, fuzzy_file_upper_case_also_match )
 {
-  auto score = fzs_get_score( "INTEGRATION.cmake", "inte cmake" );
+  auto score = fzs_get_score( "INTEGRATION.cmake", "int cmake" );
   EXPECT_EQ( score, FULL_MATCH * 2 - BOUNDARY_WORD );
 }
 

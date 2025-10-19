@@ -6,7 +6,6 @@
 #include <functional>
 #include <iostream>
 #include <string>
-#include <unordered_set>
 
 using namespace std;
 using namespace fuzzy_score_n;
@@ -37,18 +36,6 @@ namespace
     return boundaries;
   }
 
-  unordered_set< string > strictWordListInit()
-  {
-    return { "int",  "float", "double", "class", "struct", "return", "QString", "bool",      "enum", "char",
-             "void", "auto",  "struct", "class", "vector", "map",    "pair",    "constexpr", "using" };
-  }
-
-  unordered_set< string > &strictWordList()
-  {
-    static unordered_set< string > wordList = strictWordListInit();
-    return wordList;
-  }
-
   struct [[maybe_unused]] dbg
   {
     bool _addSep = false;
@@ -72,7 +59,7 @@ namespace
   };
 
   // end ist nach dem letzten gefunden zeichen
-  int scoreBoundary( const string &text, uint begin, uint end )
+  int scoreBoundary( const string_view &text, uint begin, uint end )
   {
     dbg() << "calc boundary: " << begin << end << text;
     static const vector< unsigned char > boundary = boundaryChars();
@@ -91,7 +78,7 @@ namespace
     return score;
   }
 
-  int get_strict_score( const string &text, const string &pattern )
+  int get_strict_score( const string_view &text, const string_view &pattern )
   {
     if ( const auto it = search( text.begin(),
                                  text.end(),
@@ -108,7 +95,7 @@ namespace
   }
 
   // todo posi von dem Word zurückliefern!
-  int get_fuzzy_score( const string &text, const string &pattern )
+  int get_fuzzy_score( const string_view &text, const string_view &pattern )
   {
     dbg() << "find pattern: " << pattern;
     int score = MISMATCH;
@@ -132,7 +119,7 @@ namespace
           if ( patternChar == textChar )
             break;
         }
-        dbg() << "search:" << patternChar << "pos: " << pos << "startPos " << startPos;
+        // dbg() << "search:" << patternChar << "pos: " << pos << "startPos " << startPos;
         if ( pos == text.size() )
           break;
 
@@ -176,7 +163,7 @@ namespace
     return score;
   }
 
-  int get_score( const string &text, const string &pattern )
+  int get_score( const string_view &text, const string_view &pattern )
   {
     if ( pattern.empty() )
       return FULL_MATCH;
@@ -190,36 +177,31 @@ namespace
 
     struct patternHelper_c
     {
-      string pattern;
+      string_view pattern;
       bool strict;
     };
 
-    const auto &strictWords = strictWordList();
     vector< patternHelper_c > patternHelpers;
-    string nextPattern;
     bool strict = false;
-    const uint lastPos = pattern.size() - 1;
     for ( uint i = 0; i < pattern.size(); ++i )
     {
-      const char c = pattern[ i ];
-      const bool isSpace = c == sep;
-      if ( !isSpace )
+      uint y = i;
+      for ( ; y < pattern.size(); ++y )
       {
-        if ( isupper( c ) )
+        const char c = pattern[ y ];
+        const bool isSpace = c == sep;
+        if ( isSpace )
+          break;
+        else if ( isupper( c ) )
           strict = true;
-        nextPattern.push_back( c );
       }
-      if ( isSpace || i == lastPos )
+      if ( uint newPatternSize = y - i; y > 0 )
       {
-        if ( !nextPattern.empty() )
-        {
-          if ( !strict &&
-               ( nextPattern.size() < MIN_FUZZY_PATTERN_SIZE || strictWords.find( nextPattern ) != strictWords.end() ) )
-            strict = true;
-          patternHelpers.push_back( patternHelper_c{ .pattern = nextPattern, .strict = strict } );
-          nextPattern.clear();
-          strict = false;
-        }
+        if ( !strict && newPatternSize < MIN_FUZZY_PATTERN_SIZE )
+          strict = true;
+        patternHelpers.push_back( patternHelper_c{ .pattern = pattern.substr( i, newPatternSize ), .strict = strict } );
+        strict = false;
+        i = y;
       }
     }
 
@@ -238,7 +220,7 @@ namespace
     return score;
   }
 
-  fzs_position_t *get_positions( const string &, const string &pattern )
+  fzs_position_t *get_positions( const string_view &, const string_view &pattern )
   {
     auto res = new fzs_position_t{ .data = new uint[ pattern.size() ], .size = pattern.size(), .cap = pattern.size() };
 
