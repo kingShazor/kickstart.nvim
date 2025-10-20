@@ -5,6 +5,8 @@
 #include <functional>
 #include <iostream>
 #include <string_view>
+#include <utility>
+#include <array>
 
 using namespace std;
 using namespace fuzzy_score_n;
@@ -13,7 +15,8 @@ namespace
 {
   enum
   {
-    U_CHAR_SIZE = 256
+    U_CHAR_SIZE = 256,
+    BUFFER_SIZE = 100
   };
 
   // small extra bonus for matching sign after oder before the pattern
@@ -72,7 +75,7 @@ namespace
     return score;
   }
 
-  using result_t = variant< int, vector< int > >;
+  using result_t = variant< int, vector< uint > >;
 
   /*
    * calcing a fast strict score (the pattern must match ascending).
@@ -87,7 +90,7 @@ namespace
       const auto pos = it - text.begin();
       if ( getPositions )
       {
-        vector< int > positions;
+        vector< uint > positions;
         for ( uint x = pos; x < pos + pattern.size(); ++x )
           positions.push_back( x );
         return positions;
@@ -97,7 +100,7 @@ namespace
     }
 
     if ( getPositions )
-      return vector< int >();
+      return vector< uint >();
     return MISMATCH;
   }
 
@@ -112,8 +115,8 @@ namespace
   {
     int score = MISMATCH;
     const size_t maxPos = text.size() - pattern.size();
-    vector< int > positions;
-    vector< int > resultPositions;
+    vector< uint > positions;
+    vector< uint > resultPositions;
     const int maxScore = pattern.size() * MATCH_CHAR;
     uint startPos = 0;
     for ( uint i = 0; i <= maxPos; ++i )
@@ -184,12 +187,9 @@ namespace
   result_t get_score( const string_view &text, const string_view &pattern, const bool getPositions )
   {
     if ( pattern.empty() )
-      return getPositions ? result_t{ vector< int >() } : result_t{ FULL_MATCH };
+      return getPositions ? result_t{ vector< uint >() } : result_t{ FULL_MATCH };
     if ( pattern.size() > text.size() )
-      return getPositions ? result_t{ vector< int >() } : result_t{ MISMATCH };
-
-    if ( pattern.size() < MIN_FUZZY_PATTERN_SIZE )
-      return get_strict_score( text, pattern, getPositions );
+      return getPositions ? result_t{ vector< uint >() } : result_t{ MISMATCH };
 
     const char sep = ' ';
 
@@ -216,41 +216,41 @@ namespace
       }
       if ( uint newPatternSize = y - i; y > 0 )
       {
-        if ( !strict && newPatternSize < MIN_FUZZY_PATTERN_SIZE )
-          strict = true;
         patternHelpers.push_back( patternHelper_c{ .pattern = pattern.substr( i, newPatternSize ), .strict = strict } );
         strict = false;
         i = y;
       }
     }
 
-    // creating a variant was also ugly :(
-    int score = MISMATCH;
-    vector< int > positions;
+    // ugly but a little bit faster
+    result_t result = getPositions ? result_t{ std::in_place_type< vector< uint > > } : result_t{ MISMATCH };
     for ( const auto &patternHelper : patternHelpers )
     {
-      const auto result = patternHelper.strict ? get_strict_score( text, patternHelper.pattern, getPositions )
-                                               : get_fuzzy_score( text, patternHelper.pattern, getPositions );
+      auto patternResult = patternHelper.strict ? get_strict_score( text, patternHelper.pattern, getPositions )
+                                                : get_fuzzy_score( text, patternHelper.pattern, getPositions );
+      if ( patternHelpers.size() == 1 )
+        return patternResult;
 
       if ( getPositions )
       {
-        for ( const int position : std::get< vector< int > >( result ) )
-          positions.push_back( position );
+        auto &patternPositions = std::get< vector< uint > >( patternResult );
+        auto &positions = std::get< vector< uint > >( result );
+        if ( positions.empty() )
+          std::swap( positions, patternPositions );
+        else
+          positions.insert( positions.end(), patternPositions.begin(), patternPositions.end() );
       }
       else
       {
-        const int patternScore = std::get< int >( result );
+        const int patternScore = std::get< int >( patternResult );
 
         if ( patternScore == MISMATCH )
           return MISMATCH;
-        score += patternScore;
+        std::get< int >( result ) += patternScore;
       }
     }
 
-    if ( getPositions )
-      return positions;
-
-    return score;
+    return result;
   }
 } // namespace
 
@@ -265,20 +265,16 @@ int fzs_get_score( const char *text, const char *pattern )
 // positions will be displayed by the gui
 fzs_position_t *fzs_get_positions( const char *text, const char *pattern )
 {
-  const auto positions = std::get< vector< int > >( get_score( text, pattern, true ) );
-  fzs_position_t *result = new fzs_position_t{ .data = new uint[ positions.size() ], .size = positions.size() };
-  for ( uint i = 0; i < positions.size(); ++i )
-    result->data[ i ] = positions[ i ];
+  // save mem - nice trick :-)
+  static array< uint, BUFFER_SIZE > array;
+  static fzs_position_t result{ .data = array.data(), .size = 0 };
+  const auto positions = std::get< vector< uint > >( get_score( text, pattern, true ) );
 
-  return result;
-}
+  const auto size = std::min( positions.size(), array.size() );
+  for ( uint i = 0; i < size; ++i )
+    result.data[ i ] = positions[ i ];
 
-// lua need controll over this :-(
-void fzs_free_positions( fzs_position_t *pos )
-{
-  if ( pos )
-  {
-    delete[] pos->data;
-    delete pos;
-  }
+  result.size = positions.size();
+
+  return &result;
 }

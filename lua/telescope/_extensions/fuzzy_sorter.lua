@@ -2,20 +2,20 @@ local fuzzy_sorter = require 'fzs_lib'
 local sorters = require 'telescope.sorters'
 
 local get_fuzzy_sorter = function(_) --todo use opts - for what?
-  local clear_filter_fun = function(self, prompt)
-    local filter = '^(' .. self._delimiter .. '(%S+)' .. '[' .. self._delimiter .. '%s]' .. ')'
-    local matched = prompt:match(filter)
-
-    if matched == nil then
-      return prompt
-    end
-    return prompt:sub(#matched + 1, -1)
-  end
+  -- local clear_filter_fun = function(self, prompt)
+  --   local filter = '^(' .. self._delimiter .. '(%S+)' .. '[' .. self._delimiter .. '%s]' .. ')'
+  --   local matched = prompt:match(filter)
+  --
+  --   if matched == nil then
+  --     return prompt
+  --   end
+  --   return prompt:sub(#matched + 1, -1)
+  -- end
 
   return sorters.Sorter:new {
     init = function(self)
       if self.filter_function then
-        self.__highlight_prefilter = clear_filter_fun
+        self.__highlight_prefilter = nil
       end
     end,
     destroy = function(_) end,
@@ -30,9 +30,6 @@ local get_fuzzy_sorter = function(_) --todo use opts - for what?
       end
     end,
     highlighter = function(self, prompt, display)
-      if self.__highlight_prefilter then
-        prompt = self:__highlight_prefilter(prompt)
-      end
       return fuzzy_sorter.get_pos(display, prompt)
     end,
   }

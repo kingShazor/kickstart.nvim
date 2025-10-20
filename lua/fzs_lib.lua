@@ -16,7 +16,6 @@ ffi.cdef [[
   } fzs_position_t;
 
   fzs_position_t *fzs_get_positions(const char *text, const char *pattern);
-  void fzs_free_positions(fzs_position_t *pos);
   int32_t fzs_get_score(const char *text, const char *pattern);
 ]]
 
@@ -40,7 +39,6 @@ fzs.get_pos = function(input, pattern)
   for i = 1, tonumber(pos.size) do
     res[i] = pos.data[i - 1] + 1
   end
-  native.fzs_free_positions(pos)
 
   return res
 end

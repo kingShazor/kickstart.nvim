@@ -146,7 +146,6 @@ TEST( FuzzySorter, fuzzy_file_pos )
   EXPECT_EQ( posis->data[ 1 ], 1 );
   EXPECT_EQ( posis->data[ 2 ], 2 );
   EXPECT_EQ( posis->data[ 3 ], 3 );
-  fzs_free_positions( posis );
 }
 
 TEST( FuzzySorter, fuzzy_file_pos_missing_both_bounds )
@@ -155,7 +154,6 @@ TEST( FuzzySorter, fuzzy_file_pos_missing_both_bounds )
   EXPECT_EQ( posis->size, 2 );
   EXPECT_EQ( posis->data[ 0 ], 1 );
   EXPECT_EQ( posis->data[ 1 ], 2 );
-  fzs_free_positions( posis );
 }
 
 TEST( FuzzySorter, fuzzy_file_upper_case_pos )
@@ -169,5 +167,11 @@ TEST( FuzzySorter, fuzzy_file_upper_case_pos )
   EXPECT_EQ( posis->data[ 4 ], 13 );
   EXPECT_EQ( posis->data[ 5 ], 14 );
   EXPECT_EQ( posis->data[ 6 ], 15 );
-  fzs_free_positions( posis );
 }
+
+TEST( FuzzySorter, fuzzy_file_upper_case_only )
+{
+  auto score = fzs_get_score( "README.md", "read" );
+  EXPECT_EQ( score, FULL_MATCH - BOUNDARY_WORD );
+}
+
