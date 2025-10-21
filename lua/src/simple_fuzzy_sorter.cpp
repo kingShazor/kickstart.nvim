@@ -41,7 +41,7 @@ namespace
     return boundaries;
   }
 
-  // who would need this?
+  // some nice debugging
   struct [[maybe_unused]] dbg
   {
     bool _addSep = false;
@@ -63,6 +63,19 @@ namespace
       return *this;
     }
   };
+
+  uint utf8_char_length( unsigned char c )
+  {
+    if ( ( c & 0x80 ) == 0x00 )
+      return 1; // 0xxxxxxx -> 1-byte char
+    if ( ( c & 0xE0 ) == 0xC0 )
+      return 2; // 110xxxxx -> 2-byte char
+    if ( ( c & 0xF0 ) == 0xE0 )
+      return 3; // 1110xxxx -> 3-byte char
+    if ( ( c & 0xF8 ) == 0xF0 )
+      return 4; // 11110xxx -> 4-byte char
+    return 1; // fallback
+  }
 
   // end is after the last found sign.
   int scoreBoundary( const string_view &text, uint begin, uint end )
@@ -227,6 +240,7 @@ namespace
     struct patternHelper_c
     {
       string_view pattern;
+      // uint utf8size;
       bool strict;
     };
 
@@ -239,11 +253,20 @@ namespace
       for ( ; y < pattern.size(); ++y )
       {
         const char c = pattern[ y ];
-        const bool isSpace = c == sep;
-        if ( isSpace )
-          break;
-        else if ( c > 0 && isupper( c ) )
+        uint byte_size = utf8_char_length( static_cast< unsigned char >( c ) );
+        if ( byte_size == 1 ) // ASCII
+        {
+          const bool isSpace = c == sep;
+          if ( isSpace )
+            break;
+          else if ( c > 0 && isupper( c ) )
+            strict = true;
+        }
+        else
+        {
+          y += byte_size - 1; // y will be incremented to the next index to check via for-increment ++y
           strict = true;
+        }
       }
       if ( uint newPatternSize = y - i; y > 0 )
       {

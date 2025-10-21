@@ -88,18 +88,25 @@ TEST( FuzzySorter, fuzzy_file_very_important_char_1 )
   EXPECT_EQ( score, FULL_MATCH - BOUNDARY_WORD );
 }
 
+// über will be a sctrict search
 TEST( FuzzySorter, fuzzy_file_very_important_char_2 )
 {
   auto score = fzs_get_score( "üBertrieben.xml", "über" );
-  EXPECT_EQ( score, FULL_MATCH - BOUNDARY_WORD );
+  EXPECT_EQ( score, MISMATCH );
 }
 
-// Not - Supported
-// TEST( FuzzySorter, fuzzy_file_very_important_char_3 )
-// {
-//   auto score = fzs_get_score( "Übertrieben.xml", "über" );
-//   EXPECT_EQ( score, FULL_MATCH - BOUNDARY_WORD );
-// }
+TEST( FuzzySorter, fuzzy_file_very_important_char_3 )
+{
+  auto score = fzs_get_score( "übertriebenerText.xml", "über text" );
+  EXPECT_EQ( score, FULL_MATCH * 2 - 2 * BOUNDARY_WORD );
+}
+
+// Not - supported Utf8-fuzzy search
+TEST( FuzzySorter, fuzzy_file_very_important_char_4 )
+{
+  auto score = fzs_get_score( "Übertrieben.xml", "über" );
+  EXPECT_EQ( score, MISMATCH );
+}
 
 TEST( FuzzySorter, NoMatch )
 {
