@@ -224,15 +224,20 @@ namespace
       }
     }
 
-    // ugly but a little bit faster
+    // optimization reason: reduce creation of empty vectors
+    if ( patternHelpers.size() == 1 )
+    {
+      const auto &patternHelper = patternHelpers.back();
+      return patternHelper.strict ? get_strict_score( text, patternHelper.pattern, getPositions )
+                                                : get_fuzzy_score( text, patternHelper.pattern, getPositions );
+    }
+
+    // ugly but maybe a little bit faster
     result_t result = getPositions ? result_t{ std::in_place_type< vector< uint > > } : result_t{ MISMATCH };
     for ( const auto &patternHelper : patternHelpers )
     {
       auto patternResult = patternHelper.strict ? get_strict_score( text, patternHelper.pattern, getPositions )
                                                 : get_fuzzy_score( text, patternHelper.pattern, getPositions );
-      if ( patternHelpers.size() == 1 )
-        return patternResult;
-
       if ( getPositions )
       {
         auto &patternPositions = std::get< vector< uint > >( patternResult );
