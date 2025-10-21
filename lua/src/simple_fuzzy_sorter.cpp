@@ -7,6 +7,8 @@
 #include <string_view>
 #include <utility>
 #include <array>
+#include <vector>
+#include <variant>
 
 using namespace std;
 using namespace fuzzy_score_n;

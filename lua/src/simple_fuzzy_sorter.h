@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cstddef>
 using uint = unsigned int;
 
 namespace fuzzy_score_n
@@ -22,7 +21,7 @@ extern "C"
   typedef struct
   {
     unsigned int *data;
-    size_t size;
+    unsigned int size;
   } fzs_position_t;
 
   int fzs_get_score( const char *text, const char *pattern );
