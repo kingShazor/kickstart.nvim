@@ -8,7 +8,20 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 target_compile_options(${PROJECT_NAME}
   PRIVATE
     $<$<CXX_COMPILER_ID:MSC>:/W4>
-    $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -Wpedantic>)
+    $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:
+        -Wall
+        -Wextra
+        -Wpedantic
+        -Wconversion
+        -Wsign-conversion
+        -Wshadow
+        -Wunreachable-code
+        -Wfloat-equal
+        -Wcast-align
+        -Wundef
+        -Wno-shorten-64-to-32
+        -Wnon-virtual-dtor
+        -Werror > )
 target_compile_definitions(${PROJECT_NAME}
   PRIVATE
     $<$<PLATFORM_ID:Windows>:_CRT_NONSTDC_NO_DEPRECATE>

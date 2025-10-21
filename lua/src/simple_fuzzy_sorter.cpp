@@ -102,7 +102,7 @@ namespace
                                  boyer_moore_horspool_searcher( pattern.begin(), pattern.end() ) );
          it != text.end() )
     {
-      const auto pos = it - text.begin();
+      const auto pos = static_cast< uint >( it - text.begin() );
       if ( getPositions )
       {
         vector< uint > positions;
@@ -169,7 +169,7 @@ namespace
           }
           char textChar = text[ pos ];
           if ( textChar > 0 && isupper( textChar ) )
-            textChar = tolower( textChar );
+            textChar = static_cast< char >( tolower( static_cast< unsigned char >( textChar ) ) );
           if ( patternChar == textChar )
             break;
         }
@@ -185,7 +185,7 @@ namespace
           else if ( gap > 0 )
             penalty += ( gap * GAP_PENALTY );
         }
-        positions.push_back( static_cast< int >( pos ) );
+        positions.push_back( pos );
         startPos = pos + 1;
       }
 
@@ -202,7 +202,7 @@ namespace
           break;
         }
 
-        const int newScore = pattern.size() * MATCH_CHAR - penalty;
+        const int newScore = static_cast< int >( pattern.size() ) * MATCH_CHAR - penalty;
         int normalizedScore = static_cast< int >(
           static_cast< float >( newScore ) / static_cast< float >( maxScore ) * 100.0f + 0.5f );
         normalizedScore += ( -BOUNDARY_BOTH + boundaryScore );
