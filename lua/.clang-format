@@ -48,7 +48,6 @@ BraceWrapping:
 #BracedInitializerIndentWidth: 2 # clang-format 17
 BreakAfterAttributes: Never
 BreakBeforeBinaryOperators: None
-#BreakBeforeLogicalOperators: false
 BreakBeforeBraces: Custom
 BreakBeforeConceptDeclarations: Always
 BreakBeforeInlineASMColon: Never
@@ -61,7 +60,7 @@ CommentPragmas:  '^(\:|\s*deprecate.*)'
 CompactNamespaces: false
 ConstructorInitializerIndentWidth: 2
 ContinuationIndentWidth: 2
-Cpp11BracedListStyle: false
+Cpp11BracedListStyle: true
 DerivePointerAlignment: false
 DisableFormat:   false
 EmptyLineAfterAccessModifier: Never
@@ -187,4 +186,3 @@ TypenameMacros: []
 UseTab: Never
 WhitespaceSensitiveMacros: []
 ...
-

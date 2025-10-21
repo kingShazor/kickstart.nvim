@@ -1,14 +1,14 @@
 #include "simple_fuzzy_sorter.h"
 
 #include <algorithm>
+#include <array>
 #include <cctype>
 #include <functional>
 #include <iostream>
 #include <string_view>
 #include <utility>
-#include <array>
-#include <vector>
 #include <variant>
+#include <vector>
 
 using namespace std;
 using namespace fuzzy_score_n;
@@ -107,18 +107,28 @@ namespace
   }
 
   /*
-   * \pattern includes only lower case chars
    * fuzzy means: allowing gaps between found characters and looking also for uppercase chars
    *              we don't use UTF-8 here, because the overhead. It will only used for finding file_names
    *              so a 'ü' will have here two chars which need to match 'case sensitve'.
    *              Also meaning langugage chars count as a larger gap.
+   *
+   * \pattern        includes only lower case chars
+   * \getPositions   true: return postions instead of score
+   * \blockedRanges  if enabled only allow free spaces
    */
-  result_t get_fuzzy_score( const string_view &text, const string_view &pattern, const bool getPositions )
+  result_t get_fuzzy_score( const string_view &text,
+                            const string_view &pattern,
+                            const bool getPositions,
+                            vector< pair< uint, uint > > *blockedRanges = nullptr )
   {
     int score = MISMATCH;
     const size_t maxPos = text.size() - pattern.size();
-    vector< uint > positions;
-    vector< uint > resultPositions;
+    // static vectors are faster
+    static vector< uint > positions;
+    static vector< uint > resultPositions;
+    positions.clear();
+    resultPositions.clear();
+
     const int maxScore = pattern.size() * MATCH_CHAR;
     uint startPos = 0;
     for ( uint i = 0; i <= maxPos; ++i )
@@ -131,6 +141,19 @@ namespace
         // find fuzzy position
         for ( ; pos < text.size(); ++pos )
         {
+          if ( blockedRanges && !blockedRanges->empty() )
+          {
+            bool matchRange = false;
+            for ( auto &blockRange : *blockedRanges )
+              if ( pos >= blockRange.first && pos <= blockRange.second )
+              {
+                pos = blockRange.second;
+                matchRange = true;
+                break;
+              }
+            if ( matchRange )
+              continue;
+          }
           char textChar = text[ pos ];
           if ( textChar > 0 && isupper( textChar ) )
             textChar = tolower( textChar );
@@ -170,11 +193,17 @@ namespace
         int normalizedScore = static_cast< int >(
           static_cast< float >( newScore ) / static_cast< float >( maxScore ) * 100.0f + 0.5f );
         normalizedScore += ( -BOUNDARY_BOTH + boundaryScore );
-        if ( getPositions && normalizedScore > score )
+        if ( normalizedScore > score )
           std::swap( positions, resultPositions );
         score = max( normalizedScore, score );
       }
       positions.clear();
+    }
+
+    if ( score != MISMATCH && blockedRanges )
+    {
+      blockedRanges->push_back( pair( resultPositions.front(), resultPositions.back() ) );
+      sort( blockedRanges->begin(), blockedRanges->end() );
     }
 
     if ( getPositions )
@@ -229,15 +258,16 @@ namespace
     {
       const auto &patternHelper = patternHelpers.back();
       return patternHelper.strict ? get_strict_score( text, patternHelper.pattern, getPositions )
-                                                : get_fuzzy_score( text, patternHelper.pattern, getPositions );
+                                  : get_fuzzy_score( text, patternHelper.pattern, getPositions );
     }
 
     // ugly but maybe a little bit faster
     result_t result = getPositions ? result_t{ std::in_place_type< vector< uint > > } : result_t{ MISMATCH };
+    vector< pair< uint, uint > > range;
     for ( const auto &patternHelper : patternHelpers )
     {
       auto patternResult = patternHelper.strict ? get_strict_score( text, patternHelper.pattern, getPositions )
-                                                : get_fuzzy_score( text, patternHelper.pattern, getPositions );
+                                                : get_fuzzy_score( text, patternHelper.pattern, getPositions, &range );
       if ( getPositions )
       {
         auto &patternPositions = std::get< vector< uint > >( patternResult );

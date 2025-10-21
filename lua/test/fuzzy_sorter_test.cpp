@@ -175,3 +175,21 @@ TEST( FuzzySorter, fuzzy_file_upper_case_only )
   EXPECT_EQ( score, FULL_MATCH - BOUNDARY_WORD );
 }
 
+TEST( FuzzySorter, fuzzy_word_mismatch_leads_to_distract )
+{
+  auto score = fzs_get_score( "mapping_suggest_station_header.cpp", "map sug ope" );
+  EXPECT_EQ( score, MISMATCH );
+}
+
+TEST( FuzzySorter, fuzzy_do_not_use_same_word )
+{
+  auto score = fzs_get_score( "tmpl/unique_type_range.h", "que ue" );
+  EXPECT_EQ( score, MISMATCH );
+}
+
+TEST( FuzzySorter, fuzzy_do_not_use_same_word_but_find_word )
+{
+  auto score = fzs_get_score( "network/mail_queue.cpp", "que ue" );
+  EXPECT_EQ( score, FULL_MATCH * 2 - 2 * BOUNDARY_WORD );
+}
+

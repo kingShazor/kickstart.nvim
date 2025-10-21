@@ -212,7 +212,7 @@ end ---@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
 
 local compile_commands_dir = os.getenv 'CLANGD_COMPILE_COMMANDS_DIR' or os.getenv 'PWD'
-local clangd_bin = vim.fn.executable 'clangd' == 1 and 'clangd' or 'clangd-15'
+local clangd_bin = vim.fn.executable 'clangd' == 1 and 'clangd' or 'clangd-20'
 vim.lsp.config.clangd = {
   cmd = { clangd_bin, '--background-index', '--compile-commands-dir=' .. compile_commands_dir },
   root_markers = { 'compile_commands.json', 'compile_flags.txt' },
