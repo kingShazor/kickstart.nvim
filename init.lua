@@ -459,6 +459,13 @@ require('lazy').setup({
     -- branch = 'master',
     dependencies = {
       'nvim-lua/plenary.nvim',
+      {
+        'kingShazor/telescope-fuzzy-sorter.nvim',
+        build = 'make',
+        cond = function()
+          return vim.fn.executable 'make' == 1
+        end,
+      },
       -- { -- If encountering errors, see telescope-fzf-native README for installation instructions
       --   'nvim-telescope/telescope-fzf-native.nvim',
       --
