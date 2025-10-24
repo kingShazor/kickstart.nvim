@@ -211,12 +211,15 @@ if not vim.loop.fs_stat(lazypath) then
 end ---@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
 
+local lsp_encoding = 'utf-8'
+
 local compile_commands_dir = os.getenv 'CLANGD_COMPILE_COMMANDS_DIR' or os.getenv 'PWD'
 local clangd_bin = vim.fn.executable 'clangd' == 1 and 'clangd' or 'clangd-20'
 vim.lsp.config.clangd = {
   cmd = { clangd_bin, '--background-index', '--compile-commands-dir=' .. compile_commands_dir },
   root_markers = { 'compile_commands.json', 'compile_flags.txt' },
   filetypes = { 'c', 'cpp', 'ixx' },
+  general = { positionEncodings = { lsp_encoding } },
 }
 
 vim.lsp.config.luals = {
@@ -247,8 +250,16 @@ vim.lsp.config.luals = {
   workspace = {
     library = vim.api.nvim_get_runtime_file('', true),
   },
+  general = { positionEncodings = { lsp_encoding } },
 }
-vim.lsp.enable { 'clangd', 'luals' }
+
+vim.lsp.config.zls = {
+  cmd = { 'zls' },
+  filetypes = { 'zig' },
+  general = { positionEncodings = { lsp_encoding } },
+}
+
+vim.lsp.enable { 'clangd', 'luals', 'zls' }
 
 vim.keymap.set({ 'n', 'i' }, '<c-space>', function()
   vim.lsp.completion.get()
@@ -372,8 +383,9 @@ require('lazy').setup({
     cmd = 'Copilot',
     event = 'VimEnter',
     cond = function()
-      local filename = vim.fn.expand '~/.config/github-copilot/apps.json'
-      return vim.fn.filereadable(filename) == 1
+      -- local filename = vim.fn.expand '~/.config/github-copilot/apps.json'
+      -- return vim.fn.filereadable(filename) == 1
+      return false
     end,
     init = function()
       -- Keymap immer setzen, auch wenn Plugin noch nicht geladen ist
