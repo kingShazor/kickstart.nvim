@@ -549,8 +549,9 @@ require('lazy').setup({
         },
       }
 
-      -- Enable Telescope extensions if they are installed
+      -- -- Enable Telescope extensions if they are installed
       pcall(require('telescope').load_extension, 'fuzzy_sorter')
+      -- pcall(require('telescope').load_extension, 'fzf')
       local harpoon = require 'harpoon'
       harpoon:setup {}
 
