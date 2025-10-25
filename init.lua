@@ -540,7 +540,7 @@ require('lazy').setup({
           },
         },
         pickers = {
-          find_files = { path_display = { 'smart' }, hidden = true },
+          find_files = { path_display = { 'absolute' }, hidden = true },
           keymaps = { layout_config = { prompt_position = 'top' } },
           grep_string = { path_display = { 'smart' } },
           oldfiles = { path_display = { 'smart' } },
