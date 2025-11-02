@@ -334,7 +334,6 @@ require('lazy').setup({
       require('blame').setup()
     end,
   },
-  { 'tpope/vim-sleuth' },
   {
     'mason-org/mason.nvim',
     opts = {
