@@ -817,7 +817,7 @@ require('lazy').setup({
             ['öw'] = '@parameter.inner',
           },
           goto_previous_start = {
-            ['ör'] = '@parameter.inner',
+            ['öb'] = '@parameter.inner',
           },
         },
       },
