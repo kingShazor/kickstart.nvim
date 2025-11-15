@@ -374,6 +374,14 @@ require('lazy').setup({
     end,
   },
   {
+    dir = vim.fn.expand '~/my-projects/recipe-picker.nvim',
+    name = 'recipe-picker.nvim',
+    config = function()
+      local picker = require 'recipe-picker'
+      vim.keymap.set('n', '<leader>p', picker.search, { desc = 'recipe-[p]icker' })
+    end,
+  },
+  {
     'ThePrimeagen/harpoon',
     branch = 'harpoon2',
     dependencies = { 'nvim-lua/plenary.nvim' },
