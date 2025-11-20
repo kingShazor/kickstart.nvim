@@ -90,6 +90,7 @@ vim.keymap.set('n', '<leader>x', vim.diagnostic.setloclist, { desc = 'Open diagn
 vim.keymap.set('n', '<leader>w', ':write<CR>', { desc = '[w]rite buffer' })
 vim.keymap.set('n', '<leader>q', ':quit<CR>', { desc = '[q]uit nvim' })
 vim.keymap.set('n', '<leader>R', ':update<CR> :source<CR>', { desc = 'Source files' })
+vim.keymap.set('i', '<CapsLock>', '<Esc>', { desc = '[CL] normal mode' })
 
 -- Shift+C für Visual Block Mode
 vim.keymap.set('n', '<v', '<c-v>', { desc = 'block mode' })
@@ -158,14 +159,14 @@ end
 --  Use CTRL+<hjkl> to switch between windows
 --
 --  See `:help wincmd` for a list of all window commands
-vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
-vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
-vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
-vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
-vim.keymap.set('n', '<M-j>', function()
+-- vim.keymap.set('n', '<C-h>', '<C-w>h', { desc = 'Move focus to the left window' })
+-- vim.keymap.set('n', '<C-l>', '<C-w>l', { desc = 'Move focus to the right window' })
+-- vim.keymap.set('n', '<C-j>', '<C-w>j', { desc = 'Move focus to the lower window' })
+-- vim.keymap.set('n', '<C-k>', '<C-w>k', { desc = 'Move focus to the upper window' })
+vim.keymap.set('n', '<C-n>', function()
   pNextFunc(nextFunc(true))
 end, { desc = 'jump to next local list entry' })
-vim.keymap.set('n', '<M-k>', function()
+vim.keymap.set('n', '<C-p>', function()
   pNextFunc(nextFunc(false))
 end, { desc = 'jump to prev local list entry' })
 
@@ -397,10 +398,10 @@ require('lazy').setup({
     end,
     init = function()
       -- Keymap immer setzen, auch wenn Plugin noch nicht geladen ist
-      vim.keymap.set({ 'n', 'i' }, '<M-a>', function()
+      vim.keymap.set({ 'n', 'i' }, '<F2-a>', function()
         require('copilot.suggestion').toggle_auto_trigger()
       end, { desc = 'Toggle Copilot Auto-Trigger' })
-      vim.keymap.set({ 'v' }, '<M-+>', function()
+      vim.keymap.set({ 'v' }, '<F2-+>', function()
         require('copilot.panel').open()
       end, { desc = 'Open Copilot Panel' })
     end,
@@ -408,7 +409,7 @@ require('lazy').setup({
       require('copilot').setup {
         panel = {
           keymap = {
-            open = '<M-+>',
+            open = '<F2-+>',
             jump_prev = 'ÖÖ',
             jump_next = 'öö',
           },
@@ -418,9 +419,9 @@ require('lazy').setup({
           auto_trigger = false,
           keymap = {
             accept = '<C-l>',
-            next = '<M-ö>',
-            prev = '<M-ü>',
-            dismiss = '<M-ä>',
+            next = '<F2-ö>',
+            prev = '<F2-ü>',
+            dismiss = '<F2-ä>',
           },
         },
       }
