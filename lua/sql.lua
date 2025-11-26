@@ -8,7 +8,7 @@ M = {
     [vim.fn.expand '~/db/oracle-docker.sql'] = 'oracle://kbase:kbase@172.23.18.4:1521/BUSTER',
     [vim.fn.expand '~/db/postgres-2346.sql'] = 'postgres://kbase:kbase@localhost:2346/postgres',
     [vim.fn.expand '~/db/postgres-1621.sql'] = 'postgres://kbase:kbase@localhost:1621/postgres',
-    [vim.fn.expand '~/db/postgres-docker-172.sql'] = 'postgres://kbase:kbase@172.23.17.4:5432/postgres',
+    [vim.fn.expand '~/db/postgres-docker-172.sql'] = 'postgres://kbase:kbase@172.23.35.4:5432/postgres',
   },
 
   cfg_file = vim.fn.expand '~/db/connection.lua',
