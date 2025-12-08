@@ -90,6 +90,9 @@ vim.keymap.set('n', '<leader>x', vim.diagnostic.setloclist, { desc = 'Open diagn
 vim.keymap.set('n', '<leader>w', ':write<CR>', { desc = '[w]rite buffer' })
 vim.keymap.set('n', '<leader>q', ':quit<CR>', { desc = '[q]uit nvim' })
 vim.keymap.set('n', '<leader>R', ':update<CR> :source<CR>', { desc = 'Source files' })
+vim.keymap.set('n', '<leader>i', function()
+  vim.api.nvim_command('edit ' .. vim.fn.stdpath 'config' .. '/init.lua')
+end, { desc = 'open init' })
 vim.keymap.set('i', '<C-k>', '{  };<Esc>2hi', { desc = 'add safe C++ constructor { | } and start insert mode' })
 vim.keymap.set('n', '<C-k>', '0f=xhr{f;i }<Esc>$<Esc>', { desc = 'convert unsafe constructor into sage C++ constructor' })
 -- Shift+C für Visual Block Mode
