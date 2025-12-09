@@ -382,7 +382,9 @@ require('lazy').setup({
     name = 'recipe-picker.nvim',
     config = function()
       local picker = require 'recipe-picker'
-      vim.keymap.set('n', '<leader>sf', picker.search, { desc = '[S]earch [F]iles' })
+      vim.keymap.set('n', '<leader>sf', function()
+        picker.search { relative_height = 0.6, relative_width = 0.6 } -- position_color = '#aab86c' }
+      end, { desc = '[S]earch [F]iles' })
     end,
   },
   {
