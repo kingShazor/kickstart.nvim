@@ -97,6 +97,8 @@ vim.keymap.set('i', '<C-k>', '{  };<Esc>2hi', { desc = 'add safe C++ constructor
 vim.keymap.set('n', '<C-k>', '0f=xhr{f;i }<Esc>$<Esc>', { desc = 'convert unsafe constructor into sage C++ constructor' })
 -- Shift+C für Visual Block Mode
 vim.keymap.set('n', '<v', '<c-v>', { desc = 'block mode' })
+vim.keymap.set('i', '<C-n>', '{', { desc = 'add "{"' })
+vim.keymap.set('i', '<C-m>', '}', { desc = 'add "}"' })
 -- vim.key_map('v', '<S-c>', '<C-c>', { norema })
 
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
