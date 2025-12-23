@@ -99,6 +99,29 @@ vim.keymap.set('n', '<C-k>', '0f=xhr{f;i }<Esc>$<Esc>', { desc = 'convert unsafe
 vim.keymap.set('n', '<v', '<c-v>', { desc = 'block mode' })
 vim.keymap.set('i', '<C-h>', '{', { desc = 'add "{"' })
 vim.keymap.set('i', '<C-n>', '}', { desc = 'add "}"' })
+
+vim.keymap.set('n', '<leader>f', function()
+  local ext = vim.fn.fnamemodify( vim.api.nvim_buf_get_name(0), ':e' )
+  if ext ~= 'lua' then
+    vim.lsp.buf.format { async = true }
+  else
+    vim.fn.jobstart({ 'stylua', vim.api.nvim_buf_get_name(0) }, {
+      on_exit = function()
+        vim.schedule(function()
+          vim.cmd('checktime')
+        end)
+      end,
+    })
+  end
+end, { desc = '[F]ormat buffer' })
+
+vim.api.nvim_create_autocmd('BufWritePre', {
+  pattern = '*zig',
+  callback = function()
+    vim.lsp.buf.format { timeout_ms = 500 }
+  end,
+})
+
 -- vim.key_map('v', '<S-c>', '<C-c>', { norema })
 
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
@@ -688,44 +711,6 @@ require('lazy').setup({
 
   -- You can add other tools here that you want Mason to install
   -- for you, so that they are available from within Neovim.
-
-  { -- Autoformat
-    'stevearc/conform.nvim',
-    lazy = false,
-    keys = {
-      {
-        '<leader>f',
-        function()
-          require('conform').format { async = true, lsp_fallback = true }
-        end,
-        mode = '',
-        desc = '[F]ormat buffer',
-      },
-    },
-    opts = {
-      notify_on_error = false,
-      format_on_save = function(bufnr)
-        -- Disable "format_on_save lsp_fallback" for languages that don't
-        -- have a well standardized coding style. You can add additional
-        -- languages here or re-enable it for the disabled ones.
-        local disable_filetypes = { cpp = true, c = true, h = true }
-        return {
-          timeout_ms = 500,
-          lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
-        }
-      end,
-      formatters_by_ft = {
-        lua = { 'stylua' },
-        go = { 'gofumpt' },
-        -- Conform can also run multiple formatters sequentially
-        -- python = { "isort", "black" },
-        --
-        -- You can use a sub-list to tell conform to run *until* a formatter
-        -- is found.
-        -- javascript = { { "prettierd", "prettier" } },
-      },
-    },
-  },
   {
     'sindrets/diffview.nvim',
     dependencies = { 'nvim-lua/plenary.nvim' },
