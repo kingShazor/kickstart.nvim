@@ -89,6 +89,7 @@ vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Show diagn
 vim.keymap.set('n', '<leader>x', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 vim.keymap.set('n', '<leader>w', ':write<CR>', { desc = '[w]rite buffer' })
 vim.keymap.set('n', '<leader>q', ':quit<CR>', { desc = '[q]uit nvim' })
+vim.keymap.set('n', '<leader>!', ':quit!<CR>', { desc = 'force [!]quit nvim' })
 vim.keymap.set('n', '<leader>R', ':update<CR> :source<CR>', { desc = 'Source files' })
 vim.keymap.set('n', '<leader>i', function()
   vim.api.nvim_command('edit ' .. vim.fn.stdpath 'config' .. '/init.lua')
@@ -100,6 +101,9 @@ vim.keymap.set('n', '<v', '<c-v>', { desc = 'block mode' })
 vim.keymap.set('i', '<C-h>', '{', { desc = 'add "{"' })
 vim.keymap.set('i', '<C-n>', '}', { desc = 'add "}"' })
 
+vim.keymap.set('n', ':', function()
+    require('utils').openPrompt()
+end, { desc = 'mid prompt' })
 vim.keymap.set('n', '<leader>f', function()
   local ext = vim.fn.fnamemodify( vim.api.nvim_buf_get_name(0), ':e' )
   if ext ~= 'lua' then
@@ -131,14 +135,6 @@ vim.api.nvim_create_autocmd('BufWritePre', {
 -- NOTE: This won't work in all terminal emulators/tmux/etc. Try your own mapping
 -- or just use <C-\><C-n> to exit terminal mode
 vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
-
--- TIP: Disable arrow keys in normal mode
--- vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
--- vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
--- vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
--- vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
-
--- method - string
 
 vim.keymap.set('n', 'gj', function()
   require('utils').jump_back()
@@ -216,11 +212,6 @@ vim.api.nvim_create_autocmd('TextYankPost', {
     vim.hl.on_yank()
   end,
 })
-vim.api.nvim_create_autocmd('CmdlineEnter', {
-  callback = function()
-    require('notify').dismiss { silent = true, pending = true }
-  end,
-})
 
 vim.api.nvim_create_autocmd('FileType', {
   pattern = 'sql',
@@ -293,20 +284,7 @@ vim.lsp.enable { 'clangd', 'luals', 'zls' }
 vim.keymap.set({ 'n', 'i' }, '<c-space>', function()
   vim.lsp.completion.get()
 end)
--- der linter des Grauens
--- vim.lsp.config.sqlls = {
---   cmd = { 'sql-language-server', 'up', '--method', 'stdio' },
---   filetypes = { 'sql', 'psql', 'oraclesql' },
---   settings = {
---     sqlLanguageServer = {
---       diagnostics = {
---         enabled = false, -- Deaktiviert Diagnosemeldungen
---       },
---     },
---   },
--- }
---
--- vim.lsp.enable { 'sqlls' }
+
 vim.api.nvim_create_autocmd('LspAttach', {
   callback = function(args)
     local client = vim.lsp.get_client_by_id(args.data.client_id)
@@ -333,17 +311,6 @@ vim.api.nvim_create_autocmd('LspAttach', {
     end
   end,
 })
--- [[ Configure and install plugins ]]
---
---  To check the current status of your plugins, run
---    :Lazy
---
---  You can press `?` in this menu for help. Use `:q` to close the window
---
---  To update plugins you can run
---    :Lazy update
---
--- NOTE: Here is where you install your plugins.
 require('lazy').setup({
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
 
@@ -367,31 +334,6 @@ require('lazy').setup({
     'mason-org/mason.nvim',
     opts = {
       ensure_installed = { 'lua-language-server' },
-    },
-  },
-  {
-    'folke/noice.nvim',
-    event = 'VeryLazy',
-    opts = {
-      -- add any options here
-    },
-    dependencies = {
-      -- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
-      'MunifTanjim/nui.nvim',
-      -- OPTIONAL:
-      --   `nvim-notify` is only needed, if you want to use the notification view.
-      --   If not available, we use `mini` as the fallback
-      'rcarriga/nvim-notify',
-    },
-    lsp = {
-      override = {
-        ['vim.lsp.util.convert_input_to_markdown_lines'] = true,
-        ['vim.lsp.util.stylize_markdown'] = true,
-        ['cmp.entry.get_documentation'] = true,
-      },
-    },
-    presets = {
-      command_palette = true,
     },
   },
   {
@@ -510,13 +452,6 @@ require('lazy').setup({
     -- branch = 'master',
     dependencies = {
       'nvim-lua/plenary.nvim',
-      {
-        'kingShazor/telescope-fuzzy-sorter.nvim',
-        build = 'make',
-        cond = function()
-          return vim.fn.executable 'make' == 1
-        end,
-      },
     },
     config = function()
       -- Telescope is a fuzzy finder that comes with a lot of different things that
@@ -725,65 +660,31 @@ require('lazy').setup({
     ---@type table oil.SetupOpts
     opts = {},
     -- Optional dependencies
-    dependencies = { { 'nvim-mini/mini.icons', opts = {} } },
+    -- dependencies = { { 'nvim-mini/mini.icons', opts = {} } },
     -- dependencies = { "nvim-tree/nvim-web-devicons" }, -- use if you prefer nvim-web-devicons
     -- Lazy loading is not recommended because it is very tricky to make it work correctly in all situations.
     lazy = false,
     cond = not vim.g.vscode,
   },
-  --  {
-  --    'folke/flash.nvim',
-  --    event = 'VeryLazy',
-  --    ---@type Flash.Config
-  --    opts = {},
-  --  -- stylua: ignore
-  --  keys = {
-  --    { "s", mode = { "n", "x", "o" }, function() require("flash").jump() end, desc = "Flash" },
-  --    { "S", mode = { "n", "x", "o" }, function() require("flash").treesitter() end, desc = "Flash Treesitter" },
-  --    { "r", mode = "o", function() require("flash").remote() end, desc = "Remote Flash" },
-  --    { "R", mode = { "o", "x" }, function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
-  --    { "<c-s>", mode = { "c" }, function() require("flash").toggle() end, desc = "Toggle Flash Search" },
-  --  },
-  --  },
-  --
+  {
+    'nvim-mini/mini.nvim', version = '*',
+    config = function()
   -- Better Around/Inside textobjects
   --
   -- Examples:
   --  - va)  - [V]isually select [A]round [)]paren
   --  - yinq - [Y]ank [I]nside [N]ext [']quote
   --  - ci'  - [C]hange [I]nside [']quote
-  {
-    'nvim-mini/mini.ai',
-    version = false,
-    config = function()
       require('mini.ai').setup { n_lines = 500 }
-    end,
-  },
   -- Add/delete/replace surroundings (brackets, quotes, etc.)
   --
   -- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
   -- - sd'   - [S]urround [D]elete [']quotes
   -- - sr)'  - [S]urround [R]eplace [)] [']
-  {
-    'nvim-mini/mini.surround',
-    version = false,
-    config = function()
-      require('mini.surround').setup()
-    end,
-  },
-  {
-    'nvim-mini/mini.icons',
-    version = false,
-    config = function()
-      require('mini.icons').setup()
-    end,
-  },
-  {
-    'nvim-mini/mini.statusline',
-    version = false,
-    config = function()
-      local statusline = require 'mini.statusline'
-      require('mini.icons').setup()
+    require('mini.surround').setup()
+    require('mini.notify').setup()
+    require('mini.icons').setup()
+    local statusline = require 'mini.statusline'
       statusline.setup { use_icons = vim.g.have_nerd_font }
       statusline.section_location = function()
         return '%2l:%-2v'
