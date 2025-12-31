@@ -170,7 +170,6 @@ M.openPrompt = function()
   vim.fn.prompt_setcallback(buf, function(_)
     local str = vim.api.nvim_buf_get_lines(buf, 0, -1, false)[1]
     local cmd = string.sub(str, 3)
-    -- vim.notify(string.format('prompt "%s"', cmd), vim.log.levels.WARN)
 
     if vim.api.nvim_win_is_valid(win) then
       vim.api.nvim_win_close(win, true)
@@ -222,6 +221,7 @@ M.openPrompt = function()
       setField(items[1])
     end
   end, { buffer = buf, desc = 'Autocomplete [<Tab>]' })
+
 end
 
 return M

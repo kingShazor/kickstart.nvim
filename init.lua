@@ -52,6 +52,8 @@ vim.opt.timeoutlen = 300
 -- Configure how new splits should be opened
 vim.opt.splitright = true
 vim.opt.splitbelow = true
+vim.o.cmdheight = 1
+vim.o.laststatus = 3
 
 -- Sets how neovim will display certain whitespace characters in the editor.
 --  See `:help 'list'`
@@ -102,17 +104,17 @@ vim.keymap.set('i', '<C-h>', '{', { desc = 'add "{"' })
 vim.keymap.set('i', '<C-n>', '}', { desc = 'add "}"' })
 
 vim.keymap.set('n', ':', function()
-    require('utils').openPrompt()
+  require('utils').openPrompt()
 end, { desc = 'mid prompt' })
 vim.keymap.set('n', '<leader>f', function()
-  local ext = vim.fn.fnamemodify( vim.api.nvim_buf_get_name(0), ':e' )
+  local ext = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ':e')
   if ext ~= 'lua' then
     vim.lsp.buf.format { async = true }
   else
     vim.fn.jobstart({ 'stylua', vim.api.nvim_buf_get_name(0) }, {
       on_exit = function()
         vim.schedule(function()
-          vim.cmd('checktime')
+          vim.cmd 'checktime'
         end)
       end,
     })
@@ -667,24 +669,25 @@ require('lazy').setup({
     cond = not vim.g.vscode,
   },
   {
-    'nvim-mini/mini.nvim', version = '*',
+    'nvim-mini/mini.nvim',
+    version = '*',
     config = function()
-  -- Better Around/Inside textobjects
-  --
-  -- Examples:
-  --  - va)  - [V]isually select [A]round [)]paren
-  --  - yinq - [Y]ank [I]nside [N]ext [']quote
-  --  - ci'  - [C]hange [I]nside [']quote
+      -- Better Around/Inside textobjects
+      --
+      -- Examples:
+      --  - va)  - [V]isually select [A]round [)]paren
+      --  - yinq - [Y]ank [I]nside [N]ext [']quote
+      --  - ci'  - [C]hange [I]nside [']quote
       require('mini.ai').setup { n_lines = 500 }
-  -- Add/delete/replace surroundings (brackets, quotes, etc.)
-  --
-  -- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
-  -- - sd'   - [S]urround [D]elete [']quotes
-  -- - sr)'  - [S]urround [R]eplace [)] [']
-    require('mini.surround').setup()
-    require('mini.notify').setup()
-    require('mini.icons').setup()
-    local statusline = require 'mini.statusline'
+      -- Add/delete/replace surroundings (brackets, quotes, etc.)
+      --
+      -- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
+      -- - sd'   - [S]urround [D]elete [']quotes
+      -- - sr)'  - [S]urround [R]eplace [)] [']
+      require('mini.surround').setup()
+      require('mini.notify').setup()
+      require('mini.icons').setup()
+      local statusline = require 'mini.statusline'
       statusline.setup { use_icons = vim.g.have_nerd_font }
       statusline.section_location = function()
         return '%2l:%-2v'
