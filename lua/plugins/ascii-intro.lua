@@ -55,7 +55,7 @@ M = {
       border = 'rounded',
     })
     vim.wo[win].winhl = 'NormalFloat:Normal,FloatBorder:IntroHighlight'
-    vim.api.nvim_create_autocmd({ 'InsertEnter', 'BufHidden' }, {
+    vim.api.nvim_create_autocmd({ 'InsertEnter', 'BufHidden', 'BufEnter' }, {
       once = true,
       callback = function()
         if vim.api.nvim_win_is_valid(win) then

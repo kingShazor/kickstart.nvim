@@ -102,6 +102,9 @@ vim.keymap.set('n', '<C-k>', '0f=xhr{f;i }<Esc>$<Esc>', { desc = 'convert unsafe
 vim.keymap.set('n', '<v', '<c-v>', { desc = 'block mode' })
 vim.keymap.set('i', '<C-h>', '{', { desc = 'add "{"' })
 vim.keymap.set('i', '<C-n>', '}', { desc = 'add "}"' })
+vim.keymap.set({ 'i', 'n', 'v' }, '´', '`', { desc = 'quick backtick [´]->´' })
+vim.keymap.set('n', '<leader>o', 'o<Esc>k', { desc = '[ o] Insert line under curser' })
+vim.keymap.set('n', '<leader>O', 'O<Esc>j', { desc = '[ o] Insert line above curser' })
 
 vim.keymap.set('n', ':', function()
   require('utils').openPrompt()
@@ -195,6 +198,51 @@ end, { desc = 'jump to next local list entry' })
 vim.keymap.set('n', '<C-p>', function()
   pNextFunc(nextFunc(false))
 end, { desc = 'jump to prev local list entry' })
+
+vim.keymap.set('n', '<leader>b', function()
+  local bufferName = vim.api.nvim_buf_get_name(0)
+  vim.fn.setreg('+', bufferName)
+end, { desc = '[<leader>b] copy buffer name to clipboard' })
+vim.keymap.set('n', '<C-g>', function()
+  local filepath = vim.api.nvim_buf_get_name(0)
+  local cmd = { 'git', 'log', '--pretty=format:%h %ad %an %s', '--date=short', '--follow', '--', filepath }
+
+  vim.fn.jobstart(cmd, {
+    stdout_buffered = true,
+    on_stdout = function(_, data)
+      if not data then
+        return
+      end
+      local lines = vim.tbl_filter(function(line)
+        return line ~= ''
+      end, data)
+
+      -- Floating Window erstellen
+      local buf = vim.api.nvim_create_buf(false, true)
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+      vim.api.nvim_buf_set_keymap(buf, 'n', 'q', '<cmd>bd!<CR>', {
+        nowait = true,
+        noremap = true,
+        silent = true,
+      })
+
+      local width = math.floor(vim.o.columns * 0.8)
+      local height = math.floor(vim.o.lines * 0.6)
+      local row = math.floor((vim.o.lines - height) / 2)
+      local col = math.floor((vim.o.columns - width) / 2)
+
+      vim.api.nvim_open_win(buf, true, {
+        relative = 'editor',
+        width = width,
+        height = height,
+        row = row,
+        col = col,
+        style = 'minimal',
+        border = 'rounded',
+      })
+    end,
+  })
+end, { desc = '[<C-g] show git history for buffer' })
 
 if not vim.g.vscode then
   vim.keymap.set('n', '-', '<CMD>Oil<CR>', { desc = 'Open parent directory' })
@@ -475,54 +523,8 @@ require('lazy').setup({
         builtin.find_files { cwd = vim.fn.expand '~/db', search_file = '*.sql' }
       end, { desc = 'Find [S]q[L] files' })
       vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
-      vim.keymap.set('n', '<leader>o', 'o<Esc>k', { desc = '[ o] Insert line under curser' })
-      vim.keymap.set('n', '<leader>O', 'O<Esc>j', { desc = '[ o] Insert line above curser' })
       vim.keymap.set('n', '<leader>gd', ':DiffviewOpen<CR>', { desc = 'Git Diffview open' })
       vim.keymap.set('n', '<leader>gD', ':DiffviewFileHistory<CR>', { desc = 'Git File History' })
-      vim.keymap.set('n', '<leader>b', function()
-        local bufferName = vim.api.nvim_buf_get_name(0)
-        vim.fn.setreg('+', bufferName)
-      end, { desc = '[<leader>b] copy buffer name to clipboard' })
-      vim.keymap.set('n', '<C-g>', function()
-        local filepath = vim.api.nvim_buf_get_name(0)
-        local cmd = { 'git', 'log', '--pretty=format:%h %ad %an %s', '--date=short', '--follow', '--', filepath }
-
-        vim.fn.jobstart(cmd, {
-          stdout_buffered = true,
-          on_stdout = function(_, data)
-            if not data then
-              return
-            end
-            local lines = vim.tbl_filter(function(line)
-              return line ~= ''
-            end, data)
-
-            -- Floating Window erstellen
-            local buf = vim.api.nvim_create_buf(false, true)
-            vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
-            vim.api.nvim_buf_set_keymap(buf, 'n', 'q', '<cmd>bd!<CR>', {
-              nowait = true,
-              noremap = true,
-              silent = true,
-            })
-
-            local width = math.floor(vim.o.columns * 0.8)
-            local height = math.floor(vim.o.lines * 0.6)
-            local row = math.floor((vim.o.lines - height) / 2)
-            local col = math.floor((vim.o.columns - width) / 2)
-
-            vim.api.nvim_open_win(buf, true, {
-              relative = 'editor',
-              width = width,
-              height = height,
-              row = row,
-              col = col,
-              style = 'minimal',
-              border = 'rounded',
-            })
-          end,
-        })
-      end, { desc = '[<C-g] show git history for buffer' })
 
       -- Slightly advanced example of overriding default behavior and theme
       vim.keymap.set('n', '<leader>/', function()
@@ -549,8 +551,6 @@ require('lazy').setup({
     end,
   },
 
-  -- You can add other tools here that you want Mason to install
-  -- for you, so that they are available from within Neovim.
   {
     'sindrets/diffview.nvim',
     dependencies = { 'nvim-lua/plenary.nvim' },
@@ -646,48 +646,7 @@ require('lazy').setup({
       --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
     end,
   },
-  -- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the
-  -- init.lua. If you want these files, they are in the repository, so you can just download them and
-  -- place them in the correct locations.
-
-  -- NOTE: Next step on your Neovim journey: Add/Configure additional plugins for Kickstart
-  --
-  --  Here are some example plugins that I've included in the Kickstart repository.
-  --  Uncomment any of the lines below to enable them (you will need to restart nvim).
-  --
-  -- require 'kickstart.plugins.debug',
-  -- require 'kickstart.plugins.indent_line',
-  -- require 'kickstart.plugins.lint',
-  -- require 'kickstart.plugins.autopairs',
-  -- require 'kickstart.plugins.neo-tree',
-
-  -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
-  --    This is the easiest way to modularize your config.
-  --
-  --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
-  --    For additional information, see `:help lazy.nvim-lazy.nvim-structuring-your-plugins`
-  -- { import = 'custom.plugins' },
-}, {
-  ui = {
-    -- If you are using a Nerd Font: set icons to an empty table which will use the
-    -- default lazy.nvim defined Nerd Font icons, otherwise define a unicode icons table
-    icons = vim.g.have_nerd_font and {} or {
-      cmd = '⌘',
-      config = '🛠',
-      event = '📅',
-      ft = '📂',
-      init = '⚙',
-      keys = '🗝',
-      plugin = '🔌',
-      runtime = '💻',
-      require = '🌙',
-      source = '📄',
-      start = '🚀',
-      task = '📌',
-      lazy = '💤 ',
-    },
-  },
-})
+}, {})
 
 -- In this case, we create a function that lets us more easily define mappings specific
 -- for LSP related items. It sets the mode, buffer and description for us each time.
@@ -780,5 +739,3 @@ end
 
 timer = vim.uv.new_timer()
 timer:start(5000, checkInterval, vim.schedule_wrap(checkTimes))
--- The line beneath this is called `modeline`. See `:help modeline`
--- vim: ts=2 sts=2 sw=2 et
