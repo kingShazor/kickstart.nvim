@@ -339,14 +339,6 @@ require('lazy').setup({
     },
   },
   {
-    'zk-org/zk-nvim',
-    config = function()
-      require('zk').setup {
-        -- See Setup section below
-      }
-    end,
-  },
-  {
     dir = vim.fn.expand '~/my-projects/recipe-picker.nvim',
     name = 'recipe-picker.nvim',
     config = function()
@@ -354,51 +346,6 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>sf', function()
         picker.search { relative_height = 0.6, relative_width = 0.6 } -- position_color = '#aab86c' }
       end, { desc = '[S]earch [F]iles' })
-    end,
-  },
-  {
-    'ThePrimeagen/harpoon',
-    branch = 'harpoon2',
-    dependencies = { 'nvim-lua/plenary.nvim' },
-  },
-  {
-    'zbirenbaum/copilot.lua',
-    cmd = 'Copilot',
-    event = 'VimEnter',
-    cond = function()
-      -- local filename = vim.fn.expand '~/.config/github-copilot/apps.json'
-      -- return vim.fn.filereadable(filename) == 1
-      return false
-    end,
-    init = function()
-      -- Keymap immer setzen, auch wenn Plugin noch nicht geladen ist
-      vim.keymap.set({ 'n', 'i' }, '<F2-a>', function()
-        require('copilot.suggestion').toggle_auto_trigger()
-      end, { desc = 'Toggle Copilot Auto-Trigger' })
-      vim.keymap.set({ 'v' }, '<F2-+>', function()
-        require('copilot.panel').open()
-      end, { desc = 'Open Copilot Panel' })
-    end,
-    config = function()
-      require('copilot').setup {
-        panel = {
-          keymap = {
-            open = '<F2-+>',
-            jump_prev = 'ÖÖ',
-            jump_next = 'öö',
-          },
-        },
-
-        suggestion = {
-          auto_trigger = false,
-          keymap = {
-            accept = '<C-l>',
-            next = '<F2-ö>',
-            prev = '<F2-ü>',
-            dismiss = '<F2-ä>',
-          },
-        },
-      }
     end,
   },
   -- NOTE: Plugins can also be configured to run Lua code when they are loaded.
@@ -512,50 +459,6 @@ require('lazy').setup({
 
       -- -- Enable Telescope extensions if they are installed
       pcall(require('telescope').load_extension, 'fuzzy_sorter')
-      local harpoon = require 'harpoon'
-      harpoon:setup {}
-
-      -- basic telescope configuration
-      local conf = require('telescope.config').values
-      local function toggle_telescope(harpoon_files)
-        local file_paths = {}
-        for _, item in ipairs(harpoon_files.items) do
-          table.insert(file_paths, item.value)
-        end
-
-        require('telescope.pickers')
-          .new({}, {
-            prompt_title = 'Harpoon',
-            finder = require('telescope.finders').new_table {
-              results = file_paths,
-            },
-            previewer = conf.file_previewer {},
-            sorter = conf.generic_sorter {},
-          })
-          :find()
-      end
-
-      vim.keymap.set('n', '<C-e>', function()
-        toggle_telescope(harpoon:list())
-      end, { desc = 'Open harpoon window' })
-      vim.keymap.set('n', '<leader>a', function()
-        harpoon:list():add()
-      end)
-      vim.keymap.set('n', '<leader>h', function()
-        harpoon:list():select(1)
-      end)
-      vim.keymap.set('n', '<leader>j', function()
-        harpoon:list():select(2)
-      end)
-      vim.keymap.set('n', '<leader>k', function()
-        harpoon:list():select(3)
-      end)
-      vim.keymap.set('n', '<leader>l', function()
-        harpoon:list():select(4)
-      end)
-      vim.keymap.set('n', '<leader>e', function()
-        harpoon.ui:toggle_quick_menu(harpoon:list())
-      end)
       -- See `:help telescope.builtin`
       local builtin = require 'telescope.builtin'
 
