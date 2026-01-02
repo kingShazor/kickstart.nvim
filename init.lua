@@ -233,7 +233,6 @@ if not vim.loop.fs_stat(lazypath) then
 end ---@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
 
-require 'lsp'
 
 require('lazy').setup({
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
@@ -576,4 +575,11 @@ end, 'switch between source and header')
 vim.api.nvim_set_hl(0, 'MiniCursorword', { bg = '#5a4a2f', underline = false })
 vim.api.nvim_set_hl(0, 'MiniCursorwordCurrent', { bg = '#5f875f', bold = true })
 
-require('apt_packages_check').startTimer()
+-- deferred loading
+vim.api.nvim_create_autocmd({ 'VimEnter' }, {
+      once = true,
+      callback = function()
+        require('apt_packages_check').startTimer()
+        require 'lsp'
+      end,
+})
