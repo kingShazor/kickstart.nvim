@@ -24,15 +24,9 @@ vim.opt.mouse = 'a'
 -- Don't show the mode, since it's already in the status line
 vim.opt.showmode = false
 
--- Sync clipboard between OS and Neovim.
---  Remove this option if you want your OS clipboard to remain independent.
---  See `:help 'clipboard'`
 vim.opt.clipboard = 'unnamedplus'
 
--- Enable break indent
 vim.opt.breakindent = true
-
--- Save undo history
 vim.opt.undofile = true
 
 -- Case-insensitive searching UNLESS \C or one or more capital letters in the search term
@@ -77,8 +71,6 @@ vim.opt.tabstop = 2
 
 -- buildin completion
 vim.o.completeopt = 'menu,menuone,noinsert,popup'
--- [[ Basic Keymaps ]]
---  See `:help vim.keymap.set()`
 
 -- Set highlight on search, but clear on pressing <Esc> in normal mode
 vim.opt.hlsearch = true
@@ -98,7 +90,6 @@ vim.keymap.set('n', '<leader>i', function()
 end, { desc = 'open init' })
 vim.keymap.set('i', '<C-k>', '{  };<Esc>2hi', { desc = 'add safe C++ constructor { | } and start insert mode' })
 vim.keymap.set('n', '<C-k>', '0f=xhr{f;i }<Esc>$<Esc>', { desc = 'convert unsafe constructor into sage C++ constructor' })
--- Shift+C für Visual Block Mode
 vim.keymap.set('n', '<v', '<c-v>', { desc = 'block mode' })
 vim.keymap.set('i', '<C-h>', '{', { desc = 'add "{"' })
 vim.keymap.set('i', '<C-n>', '}', { desc = 'add "}"' })
@@ -119,8 +110,6 @@ vim.api.nvim_create_autocmd('BufWritePre', {
     vim.lsp.buf.format { timeout_ms = 500 }
   end,
 })
-
--- vim.key_map('v', '<S-c>', '<C-c>', { norema })
 
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
@@ -233,7 +222,6 @@ if not vim.loop.fs_stat(lazypath) then
 end ---@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
 
-
 require('lazy').setup({
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
 
@@ -246,7 +234,7 @@ require('lazy').setup({
   --  This is equivalent to:
   --    require('Comment').setup({})
 
-  { import = 'plugins' },
+  -- { import = 'plugins' },
   {
     'FabijanZulj/blame.nvim',
     config = function()
@@ -319,7 +307,6 @@ require('lazy').setup({
     'nvim-telescope/telescope.nvim',
     event = 'VimEnter',
     branch = '0.1.x',
-    -- branch = 'master',
     dependencies = {
       'nvim-lua/plenary.nvim',
     },
@@ -575,11 +562,14 @@ end, 'switch between source and header')
 vim.api.nvim_set_hl(0, 'MiniCursorword', { bg = '#5a4a2f', underline = false })
 vim.api.nvim_set_hl(0, 'MiniCursorwordCurrent', { bg = '#5f875f', bold = true })
 
--- deferred loading
+-- deferred loading and lazy loading
 vim.api.nvim_create_autocmd({ 'VimEnter' }, {
-      once = true,
-      callback = function()
-        require('apt_packages_check').startTimer()
-        require 'lsp'
-      end,
+  once = true,
+  callback = function()
+    require('ascii-intro').createIntro()
+    vim.schedule(function()
+      require('apt_packages_check').startTimer()
+      require 'lsp'
+    end)
+  end,
 })
