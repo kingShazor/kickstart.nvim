@@ -110,18 +110,7 @@ vim.keymap.set('n', ':', function()
   require('utils').openPrompt()
 end, { desc = 'mid prompt' })
 vim.keymap.set('n', '<leader>f', function()
-  local ext = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ':e')
-  if ext ~= 'lua' then
-    vim.lsp.buf.format { async = true }
-  else
-    vim.fn.jobstart({ 'stylua', vim.api.nvim_buf_get_name(0) }, {
-      on_exit = function()
-        vim.schedule(function()
-          vim.cmd 'checktime'
-        end)
-      end,
-    })
-  end
+  require('utils').lspFormat()
 end, { desc = '[F]ormat buffer' })
 
 vim.api.nvim_create_autocmd('BufWritePre', {
@@ -204,44 +193,7 @@ vim.keymap.set('n', '<leader>b', function()
   vim.fn.setreg('+', bufferName)
 end, { desc = '[<leader>b] copy buffer name to clipboard' })
 vim.keymap.set('n', '<C-g>', function()
-  local filepath = vim.api.nvim_buf_get_name(0)
-  local cmd = { 'git', 'log', '--pretty=format:%h %ad %an %s', '--date=short', '--follow', '--', filepath }
-
-  vim.fn.jobstart(cmd, {
-    stdout_buffered = true,
-    on_stdout = function(_, data)
-      if not data then
-        return
-      end
-      local lines = vim.tbl_filter(function(line)
-        return line ~= ''
-      end, data)
-
-      -- Floating Window erstellen
-      local buf = vim.api.nvim_create_buf(false, true)
-      vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
-      vim.api.nvim_buf_set_keymap(buf, 'n', 'q', '<cmd>bd!<CR>', {
-        nowait = true,
-        noremap = true,
-        silent = true,
-      })
-
-      local width = math.floor(vim.o.columns * 0.8)
-      local height = math.floor(vim.o.lines * 0.6)
-      local row = math.floor((vim.o.lines - height) / 2)
-      local col = math.floor((vim.o.columns - width) / 2)
-
-      vim.api.nvim_open_win(buf, true, {
-        relative = 'editor',
-        width = width,
-        height = height,
-        row = row,
-        col = col,
-        style = 'minimal',
-        border = 'rounded',
-      })
-    end,
-  })
+  require('utils').gitLogForBuf()
 end, { desc = '[<C-g] show git history for buffer' })
 
 if not vim.g.vscode then
@@ -281,86 +233,8 @@ if not vim.loop.fs_stat(lazypath) then
 end ---@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
 
-local lsp_encoding = 'utf-8'
+require 'lsp'
 
-local compile_commands_dir = os.getenv 'CLANGD_COMPILE_COMMANDS_DIR' or os.getenv 'PWD'
-local clangd_bin = vim.fn.executable 'clangd' == 1 and 'clangd' or 'clangd-20'
-vim.lsp.config.clangd = {
-  cmd = { clangd_bin, '--background-index', '--compile-commands-dir=' .. compile_commands_dir },
-  root_markers = { 'compile_commands.json', 'compile_flags.txt' },
-  filetypes = { 'c', 'cpp', 'ixx' },
-  general = { positionEncodings = { lsp_encoding } },
-}
-
-vim.lsp.config.luals = {
-  -- Command and arguments to start the server.
-  cmd = { 'lua-language-server' },
-  -- Filetypes to automatically attach to.
-  filetypes = { 'lua' },
-  -- Sets the "root directory" to the parent directory of the file in the
-  -- current buffer that contains either a ".luarc.json" or a
-  -- ".luarc.jsonc" file. Files that share a root directory will reuse
-  -- the connection to the same LSP server.
-  -- Nested lists indicate equal priority, see |vim.lsp.Config|.
-  root_markers = { '.luarc.json', '.luarc.jsonc', '.git' },
-  -- Specific settings to send to the server. The schema for this is
-  -- defined by the server. For example the schema for lua-language-server
-  -- can be found here https://raw.githubusercontent.com/LuaLS/vscode-lua/master/setting/schema.json
-  settings = {
-    Lua = {
-      runtime = {
-        version = 'LuaJIT',
-      },
-      diagnostics = {
-        -- Erlaubt globale `vim` Variable
-        globals = { 'vim' },
-      },
-    },
-  },
-  workspace = {
-    library = vim.api.nvim_get_runtime_file('', true),
-  },
-  general = { positionEncodings = { lsp_encoding } },
-}
-
-vim.lsp.config.zls = {
-  cmd = { 'zls' },
-  filetypes = { 'zig' },
-  general = { positionEncodings = { lsp_encoding } },
-}
-
-vim.lsp.enable { 'clangd', 'luals', 'zls' }
-
-vim.keymap.set({ 'n', 'i' }, '<c-space>', function()
-  vim.lsp.completion.get()
-end)
-
-vim.api.nvim_create_autocmd('LspAttach', {
-  callback = function(args)
-    local client = vim.lsp.get_client_by_id(args.data.client_id)
-    if client and client:supports_method 'textDocument/completion' then
-      vim.lsp.completion.enable(true, client.id, args.buf, { autorigger = true })
-    end
-    if client and client:supports_method 'textDocument/documentHighlight' then
-      vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
-        buffer = args.buf,
-        callback = function()
-          vim.schedule(function()
-            vim.lsp.buf.document_highlight()
-          end)
-        end,
-      })
-      vim.api.nvim_create_autocmd({ 'CursorMoved', 'CursorMovedI' }, {
-        buffer = args.buf,
-        callback = function()
-          vim.schedule(function()
-            vim.lsp.buf.clear_references()
-          end)
-        end,
-      })
-    end
-  end,
-})
 require('lazy').setup({
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
 
@@ -702,40 +576,4 @@ end, 'switch between source and header')
 vim.api.nvim_set_hl(0, 'MiniCursorword', { bg = '#5a4a2f', underline = false })
 vim.api.nvim_set_hl(0, 'MiniCursorwordCurrent', { bg = '#5f875f', bold = true })
 
-local timer = nil
-local reportTimer = nil
-local checkInterval = 3600000
-local reportTime = 1200000
-local reportMode = false
-local updateFound = 0
-
-local function checkUpdates()
-  local handle = io.popen 'apt list --upgradable 2>/dev/null | grep jammy | wc -l'
-  if handle then
-    local result = handle:read '*a'
-    handle:close()
-    updateFound = tonumber(result) or 0
-  end
-end
-
-local function notifyTimes()
-  vim.notify(('%d security updates found'):format(updateFound))
-end
-
-local function checkTimes()
-  checkUpdates()
-  if updateFound > 0 and not reportMode then
-    reportMode = true
-    if timer and timer.stop then
-      timer:stop()
-    end
-    if timer and timer.close then
-      timer:close()
-    end
-    reportTimer = vim.uv.new_timer()
-    reportTimer:start(100, reportTime, vim.schedule_wrap(notifyTimes))
-  end
-end
-
-timer = vim.uv.new_timer()
-timer:start(5000, checkInterval, vim.schedule_wrap(checkTimes))
+require('apt_packages_check').startTimer()
