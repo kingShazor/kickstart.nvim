@@ -93,7 +93,32 @@ vim.keymap.set('n', '<C-k>', '0f=xhr{f;i }<Esc>$<Esc>', { desc = 'convert unsafe
 vim.keymap.set('n', '<v', '<c-v>', { desc = 'block mode' })
 vim.keymap.set('i', '<C-h>', '{', { desc = 'add "{"' })
 vim.keymap.set('i', '<C-n>', '}', { desc = 'add "}"' })
-vim.keymap.set({ 'i', 'n', 'v' }, '´', '`', { desc = 'quick backtick [´]->´' })
+
+local function mark_desc(mark)
+  local tuple = vim.api.nvim_get_mark(mark, {})
+  if #tuple[4] == 0 then
+    return ""
+    -- return "Mark " .. mark .. " (unset)"
+  end
+  return string.format("Mark %s → %s:%d", mark, tuple[4], tuple[1])
+end
+vim.keymap.set({ 'i', 'n', 'v' }, '´q', '`Q', {})
+vim.keymap.set({ 'i', 'n', 'v' }, '´w', '`W', {})
+vim.keymap.set({ 'i', 'n', 'v' }, '´e', '`E', {})
+vim.keymap.set({ 'i', 'n', 'v' }, '´r', '`R', {})
+vim.keymap.set({ 'i', 'n', 'v' }, '´t', '`T', {})
+
+vim.keymap.set({ 'i', 'n', 'v' }, '´a', '`A', {})
+vim.keymap.set({ 'i', 'n', 'v' }, '´s', '`S', {})
+vim.keymap.set({ 'i', 'n', 'v' }, '´d', '`D', {})
+vim.keymap.set({ 'i', 'n', 'v' }, '´f', '`F', {})
+vim.keymap.set({ 'i', 'n', 'v' }, '´g', '`G', {})
+
+vim.keymap.set({ 'i', 'n', 'v' }, '´y', '`Y', {})
+vim.keymap.set({ 'i', 'n', 'v' }, '´x', '`X', {})
+vim.keymap.set({ 'i', 'n', 'v' }, '´c', '`C', {})
+vim.keymap.set({ 'i', 'n', 'v' }, '´v', '`V', {})
+vim.keymap.set({ 'i', 'n', 'v' }, '´b', '`B', {})
 vim.keymap.set('n', '<leader>o', 'o<Esc>k', { desc = '[ o] Insert line under curser' })
 vim.keymap.set('n', '<leader>O', 'O<Esc>j', { desc = '[ o] Insert line above curser' })
 
@@ -280,7 +305,7 @@ require('lazy').setup({
       wk.setup()
 
       -- Document existing key chains
-      wk.add {
+      wk.add{
         { '<leader>c', desc = '[C]ode', hidden = true },
         { '<leader>d', desc = '[D]ocument', hidden = true },
         { '<leader>r', desc = '[R]ename', hidden = true },
@@ -293,6 +318,26 @@ require('lazy').setup({
       wk.add {
         { '<leader>h', desc = 'Git [H]unk', mode = 'v' },
       }
+
+      wk.add({
+         { "´q", desc = mark_desc("Q")},
+         { "´w", desc = mark_desc("W")},
+         { "´e", desc = mark_desc("E")},
+         { "´r", desc = mark_desc("R")},
+         { "´t", desc = mark_desc("T")},
+
+         { "´a", desc = mark_desc("A")},
+         { "´s", desc = mark_desc("S")},
+         { "´d", desc = mark_desc("D")},
+         { "´f", desc = mark_desc("F")},
+         { "´f", desc = mark_desc("F")},
+
+         { "´y", desc = mark_desc("Y")},
+         { "´x", desc = mark_desc("X")},
+         { "´c", desc = mark_desc("C")},
+         { "´v", desc = mark_desc("V")},
+         { "´b", desc = mark_desc("B")},
+      })
     end,
   },
 
