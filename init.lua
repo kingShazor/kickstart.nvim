@@ -97,10 +97,31 @@ vim.keymap.set('i', '<C-n>', '}', { desc = 'add "}"' })
 local function mark_desc(mark)
   local tuple = vim.api.nvim_get_mark(mark, {})
   if #tuple[4] == 0 then
-    return ""
-    -- return "Mark " .. mark .. " (unset)"
+    return ''
   end
-  return string.format("Mark %s → %s:%d", mark, tuple[4], tuple[1])
+  return string.format('Mark %s -→ %s:%d', mark, tuple[4], tuple[1])
+end
+local function register_marks()
+  local wk = require 'which-key'
+  wk.add {
+    { '´q', desc = mark_desc 'Q' },
+    { '´w', desc = mark_desc 'W' },
+    { '´e', desc = mark_desc 'E' },
+    { '´r', desc = mark_desc 'R' },
+    { '´t', desc = mark_desc 'T' },
+
+    { '´a', desc = mark_desc 'A' },
+    { '´s', desc = mark_desc 'S' },
+    { '´d', desc = mark_desc 'D' },
+    { '´f', desc = mark_desc 'F' },
+    { '´g', desc = mark_desc 'G' },
+
+    { '´y', desc = mark_desc 'Y' },
+    { '´x', desc = mark_desc 'X' },
+    { '´c', desc = mark_desc 'C' },
+    { '´v', desc = mark_desc 'V' },
+    { '´b', desc = mark_desc 'B' },
+  }
 end
 vim.keymap.set({ 'i', 'n', 'v' }, '´q', '`Q', {})
 vim.keymap.set({ 'i', 'n', 'v' }, '´w', '`W', {})
@@ -119,6 +140,33 @@ vim.keymap.set({ 'i', 'n', 'v' }, '´x', '`X', {})
 vim.keymap.set({ 'i', 'n', 'v' }, '´c', '`C', {})
 vim.keymap.set({ 'i', 'n', 'v' }, '´v', '`V', {})
 vim.keymap.set({ 'i', 'n', 'v' }, '´b', '`B', {})
+
+local function set_mark(mark)
+  vim.cmd("normal! m" .. mark)
+
+  require("which-key").add({
+    { "´" .. mark:lower(), desc = mark_desc(mark) },
+  })
+end
+
+vim.keymap.set("n", "mq", function() set_mark("Q") end)
+vim.keymap.set("n", "mw", function() set_mark("W") end)
+vim.keymap.set("n", "me", function() set_mark("E") end)
+vim.keymap.set("n", "mr", function() set_mark("R") end)
+vim.keymap.set("n", "mt", function() set_mark("T") end)
+
+vim.keymap.set("n", "ma", function() set_mark("A") end)
+vim.keymap.set("n", "ms", function() set_mark("S") end)
+vim.keymap.set("n", "md", function() set_mark("d") end)
+vim.keymap.set("n", "mf", function() set_mark("F") end)
+vim.keymap.set("n", "mg", function() set_mark("G") end)
+
+vim.keymap.set("n", "my", function() set_mark("Y") end)
+vim.keymap.set("n", "mx", function() set_mark("x") end)
+vim.keymap.set("n", "mc", function() set_mark("c") end)
+vim.keymap.set("n", "mv", function() set_mark("v") end)
+vim.keymap.set("n", "mb", function() set_mark("b") end)
+
 vim.keymap.set('n', '<leader>o', 'o<Esc>k', { desc = '[ o] Insert line under curser' })
 vim.keymap.set('n', '<leader>O', 'O<Esc>j', { desc = '[ o] Insert line above curser' })
 
@@ -299,13 +347,13 @@ require('lazy').setup({
 
   { -- Useful plugin to show you pending keybinds.
     'folke/which-key.nvim',
-    event = 'VimEnter', -- Sets the loading event to 'VimEnter'
+    event = 'VeryLazy', -- Sets the loading event to 'VimEnter'
     config = function() -- This is the function that runs, AFTER loading
       local wk = require 'which-key'
       wk.setup()
 
       -- Document existing key chains
-      wk.add{
+      wk.add {
         { '<leader>c', desc = '[C]ode', hidden = true },
         { '<leader>d', desc = '[D]ocument', hidden = true },
         { '<leader>r', desc = '[R]ename', hidden = true },
@@ -319,25 +367,7 @@ require('lazy').setup({
         { '<leader>h', desc = 'Git [H]unk', mode = 'v' },
       }
 
-      wk.add({
-         { "´q", desc = mark_desc("Q")},
-         { "´w", desc = mark_desc("W")},
-         { "´e", desc = mark_desc("E")},
-         { "´r", desc = mark_desc("R")},
-         { "´t", desc = mark_desc("T")},
-
-         { "´a", desc = mark_desc("A")},
-         { "´s", desc = mark_desc("S")},
-         { "´d", desc = mark_desc("D")},
-         { "´f", desc = mark_desc("F")},
-         { "´f", desc = mark_desc("F")},
-
-         { "´y", desc = mark_desc("Y")},
-         { "´x", desc = mark_desc("X")},
-         { "´c", desc = mark_desc("C")},
-         { "´v", desc = mark_desc("V")},
-         { "´b", desc = mark_desc("B")},
-      })
+      register_marks()
     end,
   },
 
