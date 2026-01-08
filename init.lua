@@ -93,6 +93,8 @@ vim.keymap.set('n', '<C-k>', '0f=xhr{f;i }<Esc>$<Esc>', { desc = 'convert unsafe
 vim.keymap.set('n', '<v', '<c-v>', { desc = 'block mode' })
 vim.keymap.set('i', '<C-h>', '{', { desc = 'add "{"' })
 vim.keymap.set('i', '<C-n>', '}', { desc = 'add "}"' })
+vim.keymap.set('n', 'öb', '2F,w', { desc = 'next parameter' })
+vim.keymap.set('n', 'öw', 'f,w', { desc = 'prev parameter "}"' })
 
 local function mark_desc(mark)
   local tuple = vim.api.nvim_get_mark(mark, {})
@@ -535,11 +537,6 @@ require('lazy').setup({
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
-    dependencies = {
-      {
-        'nvim-treesitter/nvim-treesitter-textobjects',
-      },
-    },
     opts = {
       ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc', 'gitcommit' },
       -- Autoinstall languages that are not installed
@@ -552,18 +549,6 @@ require('lazy').setup({
         additional_vim_regex_highlighting = { 'ruby', 'python', 'c', 'cpp' },
       },
       indent = { enable = true, disable = { 'ruby', 'python', 'c', 'cpp' } },
-      textobjects = {
-        move = {
-          enable = true,
-          set_jumps = true,
-          goto_next_start = {
-            ['öw'] = '@parameter.inner',
-          },
-          goto_previous_start = {
-            ['öb'] = '@parameter.inner',
-          },
-        },
-      },
     },
     config = function(_, opts)
       -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
