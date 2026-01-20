@@ -1,6 +1,6 @@
 local lsp_encoding = 'utf-8'
 
-local compile_commands_dir = os.getenv 'CLANGD_COMPILE_COMMANDS_DIR' or os.getenv 'PWD'
+local compile_commands_dir = os.getenv 'CLANGD_COMPILE_COMMANDS_DIR' or os.getenv 'PWD' .. '/build'
 local clangd_bin = vim.fn.executable 'clangd' == 1 and 'clangd' or 'clangd-20'
 vim.lsp.config.clangd = {
   cmd = { clangd_bin, '--background-index', '--compile-commands-dir=' .. compile_commands_dir },
@@ -8,6 +8,10 @@ vim.lsp.config.clangd = {
   filetypes = { 'c', 'cpp', 'ixx' },
   general = { positionEncodings = { lsp_encoding } },
 }
+
+local n = require('apt_packages_check').isDebian and ' -j 30' or ' -j 8'
+
+vim.opt.makeprg = 'ninja -C ' .. compile_commands_dir .. n
 
 vim.lsp.config.luals = {
   -- Command and arguments to start the server.
