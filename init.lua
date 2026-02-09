@@ -172,7 +172,7 @@ vim.keymap.set("n", "mb", function() set_mark("B") end)
 vim.keymap.set('n', '<leader>o', 'o<Esc>k', { desc = '[ o] Insert line under curser' })
 vim.keymap.set('n', '<leader>O', 'O<Esc>j', { desc = '[ o] Insert line above curser' })
 
-vim.keymap.set('n', ':', function()
+vim.keymap.set('n', ';', function()
   require('utils').openPrompt()
 end, { desc = 'mid prompt' })
 vim.keymap.set('n', '<leader>f', function()
