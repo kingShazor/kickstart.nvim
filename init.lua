@@ -358,8 +358,11 @@ require('lazy').setup({
     config = function()
       local picker = require 'recipe-picker'
       vim.keymap.set('n', '<leader>sf', function()
-        picker.search { relative_height = 0.6, relative_width = 0.6 } -- position_color = '#aab86c' }
+        picker.file_search { relative_height = 0.6, relative_width = 0.6 } -- position_color = '#aab86c' }
       end, { desc = '[S]earch [F]iles' })
+      vim.keymap.set('n', '<leader>sq', function()
+        picker.resume()
+      end, { desc = '[S]earch [Q]resume' })
     end,
   },
   -- NOTE: Plugins can also be configured to run Lua code when they are loaded.
