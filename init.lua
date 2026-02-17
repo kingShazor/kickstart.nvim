@@ -144,30 +144,60 @@ vim.keymap.set({ 'i', 'n', 'v' }, '´v', '`V', {})
 vim.keymap.set({ 'i', 'n', 'v' }, '´b', '`B', {})
 
 local function set_mark(mark)
-  vim.cmd("normal! m" .. mark)
+  vim.cmd('normal! m' .. mark)
 
-  require("which-key").add({
-    { "´" .. mark:lower(), desc = mark_desc(mark) },
-  })
+  require('which-key').add {
+    { '´' .. mark:lower(), desc = mark_desc(mark) },
+  }
 end
 
-vim.keymap.set("n", "mq", function() set_mark("Q") end)
-vim.keymap.set("n", "mw", function() set_mark("W") end)
-vim.keymap.set("n", "me", function() set_mark("E") end)
-vim.keymap.set("n", "mr", function() set_mark("R") end)
-vim.keymap.set("n", "mt", function() set_mark("T") end)
+vim.keymap.set('n', 'mq', function()
+  set_mark 'Q'
+end)
+vim.keymap.set('n', 'mw', function()
+  set_mark 'W'
+end)
+vim.keymap.set('n', 'me', function()
+  set_mark 'E'
+end)
+vim.keymap.set('n', 'mr', function()
+  set_mark 'R'
+end)
+vim.keymap.set('n', 'mt', function()
+  set_mark 'T'
+end)
 
-vim.keymap.set("n", "ma", function() set_mark("A") end)
-vim.keymap.set("n", "ms", function() set_mark("S") end)
-vim.keymap.set("n", "md", function() set_mark("D") end)
-vim.keymap.set("n", "mf", function() set_mark("F") end)
-vim.keymap.set("n", "mg", function() set_mark("G") end)
+vim.keymap.set('n', 'ma', function()
+  set_mark 'A'
+end)
+vim.keymap.set('n', 'ms', function()
+  set_mark 'S'
+end)
+vim.keymap.set('n', 'md', function()
+  set_mark 'D'
+end)
+vim.keymap.set('n', 'mf', function()
+  set_mark 'F'
+end)
+vim.keymap.set('n', 'mg', function()
+  set_mark 'G'
+end)
 
-vim.keymap.set("n", "my", function() set_mark("Y") end)
-vim.keymap.set("n", "mx", function() set_mark("X") end)
-vim.keymap.set("n", "mc", function() set_mark("C") end)
-vim.keymap.set("n", "mv", function() set_mark("V") end)
-vim.keymap.set("n", "mb", function() set_mark("B") end)
+vim.keymap.set('n', 'my', function()
+  set_mark 'Y'
+end)
+vim.keymap.set('n', 'mx', function()
+  set_mark 'X'
+end)
+vim.keymap.set('n', 'mc', function()
+  set_mark 'C'
+end)
+vim.keymap.set('n', 'mv', function()
+  set_mark 'V'
+end)
+vim.keymap.set('n', 'mb', function()
+  set_mark 'B'
+end)
 
 vim.keymap.set('n', '<leader>o', 'o<Esc>k', { desc = '[ o] Insert line under curser' })
 vim.keymap.set('n', '<leader>O', 'O<Esc>j', { desc = '[ o] Insert line above curser' })
