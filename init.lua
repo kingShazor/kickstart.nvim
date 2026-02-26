@@ -363,7 +363,7 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>sq', function()
         picker.resume()
       end, { desc = '[S]earch [Q]resume' })
-      vim.keymap.set('n', '<leader>sg', picker.preview_mode, { desc = '[S]earch by [G]rep' })
+      vim.keymap.set('n', '<leader>sg', picker.grep_word, { desc = '[S]earch by [G]rep' })
     end,
   },
   -- NOTE: Plugins can also be configured to run Lua code when they are loaded.
@@ -571,6 +571,7 @@ require('lazy').setup({
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
+    branch = 'main',
     lazy = false,
     opts = {
       ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc', 'gitcommit' },
