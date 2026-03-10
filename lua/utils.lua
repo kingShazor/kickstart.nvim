@@ -226,9 +226,7 @@ end
 
 M.lspFormat = function()
   local ext = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ':e')
-  if ext ~= 'lua' then
-    vim.lsp.buf.format { async = true }
-  else
+  if ext == 'lua' then
     vim.fn.jobstart({ 'stylua', vim.api.nvim_buf_get_name(0) }, {
       on_exit = function()
         vim.schedule(function()
@@ -236,6 +234,16 @@ M.lspFormat = function()
         end)
       end,
     })
+  elseif ext == 'py' then
+    vim.fn.jobstart({ '/usr/local/bin/black', '--quiet', vim.api.nvim_buf_get_name(0) }, {
+      on_exit = function()
+        vim.schedule(function()
+          vim.cmd 'checktime'
+        end)
+      end,
+    })
+  else
+    vim.lsp.buf.format { async = true }
   end
 end
 

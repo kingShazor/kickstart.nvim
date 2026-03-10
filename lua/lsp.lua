@@ -50,7 +50,13 @@ vim.lsp.config.zls = {
   general = { positionEncodings = { lsp_encoding } },
 }
 
-vim.lsp.enable { 'clangd', 'luals', 'zls' }
+vim.lsp.config.pyright = {
+  cmd = { 'pyright-langserver', '--stdio' },
+  filetypes = { 'python' },
+  general = { positionEncodings = { lsp_encoding } },
+}
+
+vim.lsp.enable { 'clangd', 'luals', 'zls', 'pyright' }
 
 vim.keymap.set({ 'n', 'i' }, '<c-space>', function()
   vim.lsp.completion.get()
