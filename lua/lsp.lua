@@ -5,7 +5,7 @@ local clangd_bin = vim.fn.executable 'clangd' == 1 and 'clangd' or 'clangd-20'
 vim.lsp.config.clangd = {
   cmd = { clangd_bin, '--background-index', '--compile-commands-dir=' .. compile_commands_dir },
   root_markers = { 'compile_commands.json', 'compile_flags.txt' },
-  filetypes = { 'c', 'cpp', 'ixx' },
+  filetypes = { 'c', 'cpp' },
   general = { positionEncodings = { lsp_encoding } },
 }
 
@@ -51,7 +51,7 @@ vim.lsp.config.zls = {
 }
 
 vim.lsp.config.pyright = {
-  cmd = { 'pyright-langserver', '--stdio' },
+  cmd = { 'pyright', '--stdio' },
   filetypes = { 'python' },
   general = { positionEncodings = { lsp_encoding } },
 }

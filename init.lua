@@ -347,12 +347,6 @@ require('lazy').setup({
     end,
   },
   {
-    'mason-org/mason.nvim',
-    opts = {
-      ensure_installed = { 'lua-language-server' },
-    },
-  },
-  {
     dir = vim.fn.expand '~/my-projects/recipe-picker.nvim',
     name = 'recipe-picker.nvim',
     config = function()
