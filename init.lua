@@ -68,6 +68,7 @@ vim.opt.scrolloff = 10
 vim.opt.expandtab = true
 vim.opt.shiftwidth = 2
 vim.opt.tabstop = 2
+-- todo autoindent testen
 
 -- buildin completion
 vim.o.completeopt = 'menu,menuone,noinsert,popup'
