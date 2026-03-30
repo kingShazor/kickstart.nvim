@@ -291,9 +291,7 @@ vim.keymap.set('n', '<C-g>', function()
   require('utils').gitLogForBuf()
 end, { desc = '[<C-g] show git history for buffer' })
 
-if not vim.g.vscode then
-  vim.keymap.set('n', '-', '<CMD>Oil<CR>', { desc = 'Open parent directory' })
-end
+vim.keymap.set('n', '-', '<CMD>Oil<CR>', { desc = 'Open parent directory' })
 vim.diagnostic.config { virtual_text = true }
 
 -- [[ Basic Autocommands ]]
@@ -319,269 +317,186 @@ vim.api.nvim_create_autocmd('FileType', {
   end,
 })
 
--- [[ Install `lazy.nvim` plugin manager ]]
---    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
-local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
-if not vim.loop.fs_stat(lazypath) then
-  local lazyrepo = 'https://github.com/folke/lazy.nvim.git'
-  vim.fn.system { 'git', 'clone', '--filter=blob:none', '--branch=stable', lazyrepo, lazypath }
-end ---@diagnostic disable-next-line: undefined-field
-vim.opt.rtp:prepend(lazypath)
+-- todo
+  -- {
+  --   dir = vim.fn.expand '~/my-projects/recipe-picker.nvim',
+  --   name = 'recipe-picker.nvim',
+  --   config = function()
+  --     local picker = require 'recipe-picker'
+  --     vim.keymap.set('n', '<leader>sf', function()
+  --       picker.file_search { relative_height = 0.6, relative_width = 0.6 } -- position_color = '#aab86c' }
+  --     end, { desc = '[S]earch [F]iles' })
+  --     vim.keymap.set('n', '<leader>sq', function()
+  --       picker.resume()
+  --     end, { desc = '[S]earch [Q]resume' })
+  --     vim.keymap.set('n', '<leader>sg', picker.grep_word, { desc = '[S]earch by [G]rep' })
+  --   end,
+  -- },
 
-require('lazy').setup({
-  -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
+vim.api.nvim_create_autocmd('PackChanged', { callback = function(ev)
+  local name, kind = ev.data.spec.name, ev.data.kind
+  if name == 'nvim-treesitter' and kind == 'update' then
+    if not ev.data.active then vim.cmd.packadd('nvim-treesitter') end
+    vim.cmd('TSUpdate')
+  end
+end })
 
-  -- NOTE: Plugins can also be added by using a table,
-  -- with the first argument being the link and the following
-  -- keys can be used to configure plugin behavior/loading/etc.
+vim.pack.add({
+  'https://github.com/FabijanZulj/blame.nvim',
+  'https://github.com/folke/which-key.nvim',
+  'https://github.com/nvim-lua/plenary.nvim',
+  'https://github.com/nvim-telescope/telescope.nvim',
+  'https://github.com/sindrets/diffview.nvim',
+  'https://github.com/nvim-mini/mini.nvim',
+  'https://github.com/stevearc/oil.nvim',
+  'https://github.com/nvim-treesitter/nvim-treesitter',
+})
+
+require('blame').setup()
+
+local wk = require 'which-key'
+wk.setup()
+
+-- Document existing key chains
+wk.add {
+  { '<leader>c', desc = '[C]ode',      hidden = true },
+  { '<leader>d', desc = '[D]ocument',  hidden = true },
+  { '<leader>r', desc = '[R]ename',    hidden = true },
+  { '<leader>s', desc = '[S]earch',    hidden = true },
+  { '<leader>w', desc = '[W]orkspace', hidden = true },
+  { '<leader>t', desc = '[T]oggle',    hidden = true },
+  { '<leader>h', desc = 'Git [H]unk',  hidden = true },
+}
+-- visual mode
+wk.add {
+  { '<leader>h', desc = 'Git [H]unk', mode = 'v' },
+}
+
+register_marks()
+
+require('telescope').setup {
+  -- You can put your default mappings / updates / etc. in here
+  --  All the info you're looking for is in `:help telescope.setup()`
   --
-  -- Use `opts = {}` to force a plugin to be loaded.
-  --
-  --  This is equivalent to:
-  --    require('Comment').setup({})
-
-  -- { import = 'plugins' },
-  {
-    'FabijanZulj/blame.nvim',
-    config = function()
-      require('blame').setup()
-    end,
-  },
-  {
-    dir = vim.fn.expand '~/my-projects/recipe-picker.nvim',
-    name = 'recipe-picker.nvim',
-    config = function()
-      local picker = require 'recipe-picker'
-      vim.keymap.set('n', '<leader>sf', function()
-        picker.file_search { relative_height = 0.6, relative_width = 0.6 } -- position_color = '#aab86c' }
-      end, { desc = '[S]earch [F]iles' })
-      vim.keymap.set('n', '<leader>sq', function()
-        picker.resume()
-      end, { desc = '[S]earch [Q]resume' })
-      vim.keymap.set('n', '<leader>sg', picker.grep_word, { desc = '[S]earch by [G]rep' })
-    end,
-  },
-  -- NOTE: Plugins can also be configured to run Lua code when they are loaded.
-  --
-  -- This is often very useful to both group configuration, as well as handle
-  -- lazy loading plugins that don't need to be loaded immediately at startup.
-  --
-  -- For example, in the following configuration, we use:
-  --  event = 'VimEnter'
-  --
-  -- which loads which-key before all the UI elements are loaded. Events can be
-  -- normal autocommands events (`:help autocmd-events`).
-  --
-  -- Then, because we use the `config` key, the configuration only runs
-  -- after the plugin has been loaded:
-  --  config = function() ... end
-
-  { -- Useful plugin to show you pending keybinds.
-    'folke/which-key.nvim',
-    event = 'VeryLazy', -- Sets the loading event to 'VimEnter'
-    config = function() -- This is the function that runs, AFTER loading
-      local wk = require 'which-key'
-      wk.setup()
-
-      -- Document existing key chains
-      wk.add {
-        { '<leader>c', desc = '[C]ode', hidden = true },
-        { '<leader>d', desc = '[D]ocument', hidden = true },
-        { '<leader>r', desc = '[R]ename', hidden = true },
-        { '<leader>s', desc = '[S]earch', hidden = true },
-        { '<leader>w', desc = '[W]orkspace', hidden = true },
-        { '<leader>t', desc = '[T]oggle', hidden = true },
-        { '<leader>h', desc = 'Git [H]unk', hidden = true },
-      }
-      -- visual mode
-      wk.add {
-        { '<leader>h', desc = 'Git [H]unk', mode = 'v' },
-      }
-
-      register_marks()
-    end,
-  },
-
-  -- NOTE: Plugins can specify dependencies.
-  --
-  -- The dependencies are proper plugin specifications as well - anything
-  -- you do for a plugin at the top level, you can do for a dependency.
-  --
-  -- Use the `dependencies` key to specify the dependencies of a particular plugin
-
-  { -- Fuzzy Finder (files, lsp, etc)
-    'nvim-telescope/telescope.nvim',
-    event = 'VimEnter',
-    dependencies = {
-      'nvim-lua/plenary.nvim',
-    },
-    config = function()
-      -- Telescope is a fuzzy finder that comes with a lot of different things that
-      -- it can fuzzy find! It's more than just a "file finder", it can search
-      -- many different aspects of Neovim, your workspace, LSP, and more!
-      --
-      -- The easiest way to use Telescope, is to start by doing something like:
-      --  :Telescope help_tags
-      --
-      -- After running this command, a window will open up and you're able to
-      -- type in the prompt window. You'll see a list of `help_tags` options and
-      -- a corresponding preview of the help.
-      --
-      -- Two important keymaps to use while in Telescope are:
-      --  - Insert mode: <c-/>
-      --  - Normal mode: ?
-      --
-      -- This opens a window that shows you all of the keymaps for the current
-      -- Telescope picker. This is really useful to discover what Telescope can
-      -- do as well as how to actually do it!
-
-      -- [[ Configure Telescope ]]
-      -- See `:help telescope` and `:help telescope.setup()`
-      require('telescope').setup {
-        -- You can put your default mappings / updates / etc. in here
-        --  All the info you're looking for is in `:help telescope.setup()`
-        --
-        -- defaults = {
-        --   mappings = {
-        --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
-        --   },
-        -- },
-        defaults = {
-          layout_config = {
-            width = 0.99,
-          },
-        },
-        extensions = {
-          fuzzy_finder = {
-            fuzzy = true, -- false will only do exact matching
-            override_generic_sorter = true, -- override the generic sorter
-            override_file_sorter = true, -- override the file sorter
-            case_mode = 'smart_case', -- or "ignore_case" or "respect_case"
-            -- the default case_mode is "smart_case"
-          },
-        },
-        pickers = {
-          find_files = { path_display = { 'absolute' }, hidden = true },
-          keymaps = { layout_config = { prompt_position = 'top' } },
-          grep_string = { path_display = { 'smart' } },
-          oldfiles = { path_display = { 'smart' } },
-          buffers = { path_display = { 'smart' } },
-          lsp_references = { path_display = { 'tail' } },
-        },
-      }
-
-      -- -- Enable Telescope extensions if they are installed
-      pcall(require('telescope').load_extension, 'fuzzy_sorter')
-      -- See `:help telescope.builtin`
-      local builtin = require 'telescope.builtin'
-
-      vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
-      vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
-      -- vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
-      vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
-      vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
-      -- vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
-      vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
-      vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
-      vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
-      vim.keymap.set('n', '<leader>sl', function()
-        builtin.find_files { cwd = vim.fn.expand '~/db', search_file = '*.sql' }
-      end, { desc = 'Find [S]q[L] files' })
-      vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
-      vim.keymap.set('n', '<leader>gd', ':DiffviewOpen<CR>', { desc = 'Git Diffview open' })
-      vim.keymap.set('n', '<leader>gD', ':DiffviewFileHistory<CR>', { desc = 'Git File History' })
-
-      -- Slightly advanced example of overriding default behavior and theme
-      vim.keymap.set('n', '<leader>/', function()
-        -- You can pass additional configuration to Telescope to change the theme, layout, etc.
-        builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
-          winblend = 10,
-          previewer = false,
-        })
-      end, { desc = '[/] Fuzzily search in current buffer' })
-
-      -- It's also possible to pass additional configuration options.
-      --  See `:help telescope.builtin.live_grep()` for information about particular keys
-      vim.keymap.set('n', '<leader>s/', function()
-        builtin.live_grep {
-          grep_open_files = true,
-          prompt_title = 'Live Grep in Open Files',
-        }
-      end, { desc = '[S]earch [/] in Open Files' })
-
-      -- Shortcut for searching your Neovim configuration files
-      vim.keymap.set('n', '<leader>sn', function()
-        builtin.find_files { cwd = vim.fn.stdpath 'config' }
-      end, { desc = '[S]earch [N]eovim files' })
-    end,
-  },
-
-  {
-    'sindrets/diffview.nvim',
-    dependencies = { 'nvim-lua/plenary.nvim' },
-    cmd = { 'DiffviewOpen', 'DiffviewClose', 'DiffviewToggleFiles', 'DiffviewFileHistory' },
-    config = function()
-      require('diffview').setup()
-    end,
-  },
-  {
-    'stevearc/oil.nvim',
-    ---@module 'oil'
-    ---@type table oil.SetupOpts
-    opts = {},
-    -- Optional dependencies
-    -- dependencies = { { 'nvim-mini/mini.icons', opts = {} } },
-    -- dependencies = { "nvim-tree/nvim-web-devicons" }, -- use if you prefer nvim-web-devicons
-    -- Lazy loading is not recommended because it is very tricky to make it work correctly in all situations.
-    lazy = false,
-    cond = not vim.g.vscode,
-  },
-  {
-    'nvim-mini/mini.nvim',
-    version = '*',
-    config = function()
-      -- Better Around/Inside textobjects
-      --
-      -- Examples:
-      --  - va)  - [V]isually select [A]round [)]paren
-      --  - yinq - [Y]ank [I]nside [N]ext [']quote
-      --  - ci'  - [C]hange [I]nside [']quote
-      require('mini.ai').setup { n_lines = 500 }
-      -- Add/delete/replace surroundings (brackets, quotes, etc.)
-      --
-      -- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
-      -- - sd'   - [S]urround [D]elete [']quotes
-      -- - sr)'  - [S]urround [R]eplace [)] [']
-      require('mini.surround').setup()
-      require('mini.notify').setup()
-      require('mini.icons').setup()
-      local statusline = require 'mini.statusline'
-      statusline.setup { use_icons = vim.g.have_nerd_font }
-      statusline.section_location = function()
-        return '%2l:%-2v'
-      end
-    end,
-  },
-  { -- Highlight, edit, and navigate code
-    'nvim-treesitter/nvim-treesitter',
-    build = ':TSUpdate',
-    branch = 'main',
-    lazy = false,
-    opts = {
-      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc', 'gitcommit' },
-      -- Autoinstall languages that are not installed
-      auto_install = true,
-      highlight = {
-        enable = true,
-        -- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
-        --  If you are experiencing weird indenting issues, add the language to
-        --  the list of additional_vim_regex_highlighting and disabled languages for indent.
-        additional_vim_regex_highlighting = { 'ruby', 'python', 'c', 'cpp' },
-      },
-      indent = { enable = true, disable = { 'ruby', 'python', 'c', 'cpp' } },
+  -- defaults = {
+  --   mappings = {
+  --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
+  --   },
+  -- },
+  defaults = {
+    layout_config = {
+      width = 0.99,
     },
   },
-}, {})
+  extensions = {
+    fuzzy_finder = {
+      fuzzy = true,                         -- false will only do exact matching
+      override_generic_sorter = true,       -- override the generic sorter
+      override_file_sorter = true,          -- override the file sorter
+      case_mode = 'smart_case',             -- or "ignore_case" or "respect_case"
+      -- the default case_mode is "smart_case"
+    },
+  },
+  pickers = {
+    find_files = { path_display = { 'absolute' }, hidden = true },
+    keymaps = { layout_config = { prompt_position = 'top' } },
+    grep_string = { path_display = { 'smart' } },
+    oldfiles = { path_display = { 'smart' } },
+    buffers = { path_display = { 'smart' } },
+    lsp_references = { path_display = { 'tail' } },
+  },
+}
+
+pcall(require('telescope').load_extension, 'fuzzy_sorter')
+-- See `:help telescope.builtin`
+local builtin = require 'telescope.builtin'
+
+vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
+vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
+-- vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
+vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
+vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
+-- vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
+vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
+vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
+vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
+vim.keymap.set('n', '<leader>sl', function()
+  builtin.find_files { cwd = vim.fn.expand '~/db', search_file = '*.sql' }
+end, { desc = 'Find [S]q[L] files' })
+vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
+vim.keymap.set('n', '<leader>gd', ':DiffviewOpen<CR>', { desc = 'Git Diffview open' })
+vim.keymap.set('n', '<leader>gD', ':DiffviewFileHistory<CR>', { desc = 'Git File History' })
+
+-- Slightly advanced example of overriding default behavior and theme
+vim.keymap.set('n', '<leader>/', function()
+  -- You can pass additional configuration to Telescope to change the theme, layout, etc.
+  builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
+    winblend = 10,
+    previewer = false,
+  })
+end, { desc = '[/] Fuzzily search in current buffer' })
+
+-- It's also possible to pass additional configuration options.
+--  See `:help telescope.builtin.live_grep()` for information about particular keys
+vim.keymap.set('n', '<leader>s/', function()
+  builtin.live_grep {
+    grep_open_files = true,
+    prompt_title = 'Live Grep in Open Files',
+  }
+end, { desc = '[S]earch [/] in Open Files' })
+
+-- Shortcut for searching your Neovim configuration files
+vim.keymap.set('n', '<leader>sn', function()
+  builtin.find_files { cwd = vim.fn.stdpath 'config' }
+end, { desc = '[S]earch [N]eovim files' })
+
+require('diffview').setup()
+
+-- Better Around/Inside textobjects
+--
+-- Examples:
+--  - va)  - [V]isually select [A]round [)]paren
+--  - yinq - [Y]ank [I]nside [N]ext [']quote
+--  - ci'  - [C]hange [I]nside [']quote
+require('mini.ai').setup { n_lines = 500 }
+-- Add/delete/replace surroundings (brackets, quotes, etc.)
+--
+-- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
+-- - sd'   - [S]urround [D]elete [']quotes
+-- - sr)'  - [S]urround [R]eplace [)] [']
+require('mini.surround').setup()
+require('mini.notify').setup()
+require('mini.icons').setup()
+local statusline = require 'mini.statusline'
+statusline.setup { use_icons = vim.g.have_nerd_font }
+statusline.section_location = function()
+  return '%2l:%-2v'
+end
+
+require('oil').setup()
+require('nvim-treesitter').setup({
+  auto_install = true,
+  highlight = {
+    enable = true,
+    -- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
+    --  If you are experiencing weird indenting issues, add the language to
+    --  the list of additional_vim_regex_highlighting and disabled languages for indent.
+    additional_vim_regex_highlighting = { 'ruby', 'python', 'c', 'cpp' },
+  },
+  indent = { enable = true, disable = { 'ruby', 'python', 'c', 'cpp' } }
+})
+
+--     ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc', 'gitcommit' },
+--     -- Autoinstall languages that are not installed
+--     auto_install = true,
+--     highlight = {
+--       enable = true,
+--       -- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
+--       --  If you are experiencing weird indenting issues, add the language to
+--       --  the list of additional_vim_regex_highlighting and disabled languages for indent.
+--       additional_vim_regex_highlighting = { 'ruby', 'python', 'c', 'cpp' },
+--     },
+--     indent = { enable = true, disable = { 'ruby', 'python', 'c', 'cpp' } },
 
 -- In this case, we create a function that lets us more easily define mappings specific
 -- for LSP related items. It sets the mode, buffer and description for us each time.
