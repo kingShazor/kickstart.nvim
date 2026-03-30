@@ -317,22 +317,6 @@ vim.api.nvim_create_autocmd('FileType', {
   end,
 })
 
--- todo
-  -- {
-  --   dir = vim.fn.expand '~/my-projects/recipe-picker.nvim',
-  --   name = 'recipe-picker.nvim',
-  --   config = function()
-  --     local picker = require 'recipe-picker'
-  --     vim.keymap.set('n', '<leader>sf', function()
-  --       picker.file_search { relative_height = 0.6, relative_width = 0.6 } -- position_color = '#aab86c' }
-  --     end, { desc = '[S]earch [F]iles' })
-  --     vim.keymap.set('n', '<leader>sq', function()
-  --       picker.resume()
-  --     end, { desc = '[S]earch [Q]resume' })
-  --     vim.keymap.set('n', '<leader>sg', picker.grep_word, { desc = '[S]earch by [G]rep' })
-  --   end,
-  -- },
-
 vim.api.nvim_create_autocmd('PackChanged', { callback = function(ev)
   local name, kind = ev.data.spec.name, ev.data.kind
   if name == 'nvim-treesitter' and kind == 'update' then
@@ -486,17 +470,15 @@ require('nvim-treesitter').setup({
   indent = { enable = true, disable = { 'ruby', 'python', 'c', 'cpp' } }
 })
 
---     ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc', 'gitcommit' },
---     -- Autoinstall languages that are not installed
---     auto_install = true,
---     highlight = {
---       enable = true,
---       -- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
---       --  If you are experiencing weird indenting issues, add the language to
---       --  the list of additional_vim_regex_highlighting and disabled languages for indent.
---       additional_vim_regex_highlighting = { 'ruby', 'python', 'c', 'cpp' },
---     },
---     indent = { enable = true, disable = { 'ruby', 'python', 'c', 'cpp' } },
+vim.cmd.packadd("recipe-picker.nvim")
+local picker = require 'recipe-picker'
+vim.keymap.set('n', '<leader>sf', function()
+  picker.file_search { relative_height = 0.6, relative_width = 0.6 }     -- position_color = '#aab86c' }
+end, { desc = '[S]earch [F]iles' })
+vim.keymap.set('n', '<leader>sq', function()
+  picker.resume()
+end, { desc = '[S]earch [Q]resume' })
+vim.keymap.set('n', '<leader>sg', picker.grep_word, { desc = '[S]earch by [G]rep' })
 
 -- In this case, we create a function that lets us more easily define mappings specific
 -- for LSP related items. It sets the mode, buffer and description for us each time.

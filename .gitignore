@@ -6,4 +6,4 @@ lua/build/
 lua/.cache/
 
 spell/
-#lazy-lock.json
+pack/local/opt/recipe-picker.nvim
