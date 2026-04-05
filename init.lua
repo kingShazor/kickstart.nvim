@@ -317,15 +317,19 @@ vim.api.nvim_create_autocmd('FileType', {
   end,
 })
 
-vim.api.nvim_create_autocmd('PackChanged', { callback = function(ev)
-  local name, kind = ev.data.spec.name, ev.data.kind
-  if name == 'nvim-treesitter' and kind == 'update' then
-    if not ev.data.active then vim.cmd.packadd('nvim-treesitter') end
-    vim.cmd('TSUpdate')
-  end
-end })
+vim.api.nvim_create_autocmd('PackChanged', {
+  callback = function(ev)
+    local name, kind = ev.data.spec.name, ev.data.kind
+    if name == 'nvim-treesitter' and kind == 'update' then
+      if not ev.data.active then
+        vim.cmd.packadd 'nvim-treesitter'
+      end
+      vim.cmd 'TSUpdate'
+    end
+  end,
+})
 
-vim.pack.add({
+vim.pack.add {
   'https://github.com/FabijanZulj/blame.nvim',
   'https://github.com/folke/which-key.nvim',
   'https://github.com/nvim-lua/plenary.nvim',
@@ -334,205 +338,207 @@ vim.pack.add({
   'https://github.com/nvim-mini/mini.nvim',
   'https://github.com/stevearc/oil.nvim',
   'https://github.com/nvim-treesitter/nvim-treesitter',
-})
-
-require('blame').setup()
-
-local wk = require 'which-key'
-wk.setup()
-
--- Document existing key chains
-wk.add {
-  { '<leader>c', desc = '[C]ode',      hidden = true },
-  { '<leader>d', desc = '[D]ocument',  hidden = true },
-  { '<leader>r', desc = '[R]ename',    hidden = true },
-  { '<leader>s', desc = '[S]earch',    hidden = true },
-  { '<leader>w', desc = '[W]orkspace', hidden = true },
-  { '<leader>t', desc = '[T]oggle',    hidden = true },
-  { '<leader>h', desc = 'Git [H]unk',  hidden = true },
-}
--- visual mode
-wk.add {
-  { '<leader>h', desc = 'Git [H]unk', mode = 'v' },
 }
 
-register_marks()
+vim.schedule(function()
+  require('blame').setup()
 
-require('telescope').setup {
-  -- You can put your default mappings / updates / etc. in here
-  --  All the info you're looking for is in `:help telescope.setup()`
-  --
-  -- defaults = {
-  --   mappings = {
-  --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
-  --   },
-  -- },
-  defaults = {
-    layout_config = {
-      width = 0.99,
-    },
-  },
-  extensions = {
-    fuzzy_finder = {
-      fuzzy = true,                         -- false will only do exact matching
-      override_generic_sorter = true,       -- override the generic sorter
-      override_file_sorter = true,          -- override the file sorter
-      case_mode = 'smart_case',             -- or "ignore_case" or "respect_case"
-      -- the default case_mode is "smart_case"
-    },
-  },
-  pickers = {
-    find_files = { path_display = { 'absolute' }, hidden = true },
-    keymaps = { layout_config = { prompt_position = 'top' } },
-    grep_string = { path_display = { 'smart' } },
-    oldfiles = { path_display = { 'smart' } },
-    buffers = { path_display = { 'smart' } },
-    lsp_references = { path_display = { 'tail' } },
-  },
-}
+  local wk = require 'which-key'
+  wk.setup()
 
-pcall(require('telescope').load_extension, 'fuzzy_sorter')
--- See `:help telescope.builtin`
-local builtin = require 'telescope.builtin'
-
-vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
-vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
--- vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
-vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
-vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
--- vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
-vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
-vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
-vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
-vim.keymap.set('n', '<leader>sl', function()
-  builtin.find_files { cwd = vim.fn.expand '~/db', search_file = '*.sql' }
-end, { desc = 'Find [S]q[L] files' })
-vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
-vim.keymap.set('n', '<leader>gd', ':DiffviewOpen<CR>', { desc = 'Git Diffview open' })
-vim.keymap.set('n', '<leader>gD', ':DiffviewFileHistory<CR>', { desc = 'Git File History' })
-
--- Slightly advanced example of overriding default behavior and theme
-vim.keymap.set('n', '<leader>/', function()
-  -- You can pass additional configuration to Telescope to change the theme, layout, etc.
-  builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
-    winblend = 10,
-    previewer = false,
-  })
-end, { desc = '[/] Fuzzily search in current buffer' })
-
--- It's also possible to pass additional configuration options.
---  See `:help telescope.builtin.live_grep()` for information about particular keys
-vim.keymap.set('n', '<leader>s/', function()
-  builtin.live_grep {
-    grep_open_files = true,
-    prompt_title = 'Live Grep in Open Files',
+  -- Document existing key chains
+  wk.add {
+    { '<leader>c', desc = '[C]ode', hidden = true },
+    { '<leader>d', desc = '[D]ocument', hidden = true },
+    { '<leader>r', desc = '[R]ename', hidden = true },
+    { '<leader>s', desc = '[S]earch', hidden = true },
+    { '<leader>w', desc = '[W]orkspace', hidden = true },
+    { '<leader>t', desc = '[T]oggle', hidden = true },
+    { '<leader>h', desc = 'Git [H]unk', hidden = true },
   }
-end, { desc = '[S]earch [/] in Open Files' })
+  -- visual mode
+  wk.add {
+    { '<leader>h', desc = 'Git [H]unk', mode = 'v' },
+  }
 
--- Shortcut for searching your Neovim configuration files
-vim.keymap.set('n', '<leader>sn', function()
-  builtin.find_files { cwd = vim.fn.stdpath 'config' }
-end, { desc = '[S]earch [N]eovim files' })
+  register_marks()
 
-require('diffview').setup()
+  require('telescope').setup {
+    -- You can put your default mappings / updates / etc. in here
+    --  All the info you're looking for is in `:help telescope.setup()`
+    --
+    -- defaults = {
+    --   mappings = {
+    --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
+    --   },
+    -- },
+    defaults = {
+      layout_config = {
+        width = 0.99,
+      },
+    },
+    extensions = {
+      fuzzy_finder = {
+        fuzzy = true, -- false will only do exact matching
+        override_generic_sorter = true, -- override the generic sorter
+        override_file_sorter = true, -- override the file sorter
+        case_mode = 'smart_case', -- or "ignore_case" or "respect_case"
+        -- the default case_mode is "smart_case"
+      },
+    },
+    pickers = {
+      find_files = { path_display = { 'absolute' }, hidden = true },
+      keymaps = { layout_config = { prompt_position = 'top' } },
+      grep_string = { path_display = { 'smart' } },
+      oldfiles = { path_display = { 'smart' } },
+      buffers = { path_display = { 'smart' } },
+      lsp_references = { path_display = { 'tail' } },
+    },
+  }
 
--- Better Around/Inside textobjects
---
--- Examples:
---  - va)  - [V]isually select [A]round [)]paren
---  - yinq - [Y]ank [I]nside [N]ext [']quote
---  - ci'  - [C]hange [I]nside [']quote
-require('mini.ai').setup { n_lines = 500 }
--- Add/delete/replace surroundings (brackets, quotes, etc.)
---
--- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
--- - sd'   - [S]urround [D]elete [']quotes
--- - sr)'  - [S]urround [R]eplace [)] [']
-require('mini.surround').setup()
-require('mini.notify').setup()
-require('mini.icons').setup()
-local statusline = require 'mini.statusline'
-statusline.setup { use_icons = vim.g.have_nerd_font }
-statusline.section_location = function()
-  return '%2l:%-2v'
-end
+  pcall(require('telescope').load_extension, 'fuzzy_sorter')
+  -- See `:help telescope.builtin`
+  local builtin = require 'telescope.builtin'
 
-require('oil').setup()
-require('nvim-treesitter').setup({
-  auto_install = true,
-  highlight = {
-    enable = true,
-    -- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
-    --  If you are experiencing weird indenting issues, add the language to
-    --  the list of additional_vim_regex_highlighting and disabled languages for indent.
-    additional_vim_regex_highlighting = { 'ruby', 'python', 'c', 'cpp' },
-  },
-  indent = { enable = true, disable = { 'ruby', 'python', 'c', 'cpp' } }
-})
+  vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
+  vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
+  -- vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
+  vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
+  vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
+  -- vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
+  vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
+  vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
+  vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
+  vim.keymap.set('n', '<leader>sl', function()
+    builtin.find_files { cwd = vim.fn.expand '~/db', search_file = '*.sql' }
+  end, { desc = 'Find [S]q[L] files' })
+  vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
+  vim.keymap.set('n', '<leader>gd', ':DiffviewOpen<CR>', { desc = 'Git Diffview open' })
+  vim.keymap.set('n', '<leader>gD', ':DiffviewFileHistory<CR>', { desc = 'Git File History' })
 
-vim.cmd.packadd("recipe-picker.nvim")
-local picker = require 'recipe-picker'
-vim.keymap.set('n', '<leader>sf', function()
-  picker.file_search { relative_height = 0.6, relative_width = 0.6 }     -- position_color = '#aab86c' }
-end, { desc = '[S]earch [F]iles' })
-vim.keymap.set('n', '<leader>sq', function()
-  picker.resume()
-end, { desc = '[S]earch [Q]resume' })
-vim.keymap.set('n', '<leader>sg', picker.grep_word, { desc = '[S]earch by [G]rep' })
+  -- Slightly advanced example of overriding default behavior and theme
+  vim.keymap.set('n', '<leader>/', function()
+    -- You can pass additional configuration to Telescope to change the theme, layout, etc.
+    builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
+      winblend = 10,
+      previewer = false,
+    })
+  end, { desc = '[/] Fuzzily search in current buffer' })
 
--- In this case, we create a function that lets us more easily define mappings specific
--- for LSP related items. It sets the mode, buffer and description for us each time.
-local map = function(keys, func, desc)
-  vim.keymap.set('n', keys, func, { desc = 'LSP: ' .. desc })
-end
+  -- It's also possible to pass additional configuration options.
+  --  See `:help telescope.builtin.live_grep()` for information about particular keys
+  vim.keymap.set('n', '<leader>s/', function()
+    builtin.live_grep {
+      grep_open_files = true,
+      prompt_title = 'Live Grep in Open Files',
+    }
+  end, { desc = '[S]earch [/] in Open Files' })
 
--- Jump to the definition of the word under your cursor.
---  This is where a variable was first declared, or where a function is defined, etc.
---  To jump back, press <C-t>.
-vim.keymap.set('n', 'gd', vim.lsp.buf.definition, { desc = '[G]oto [D]efinition' })
+  -- Shortcut for searching your Neovim configuration files
+  vim.keymap.set('n', '<leader>sn', function()
+    builtin.find_files { cwd = vim.fn.stdpath 'config' }
+  end, { desc = '[S]earch [N]eovim files' })
 
--- Find references for the word under your cursor.
-map('gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
+  require('diffview').setup()
 
--- Jump to the implementation of the word under your cursor.
---  Useful when your language has ways of declaring types without an actual implementation.
-map('gI', require('telescope.builtin').lsp_implementations, '[G]oto [I]mplementation')
+  -- Better Around/Inside textobjects
+  --
+  -- Examples:
+  --  - va)  - [V]isually select [A]round [)]paren
+  --  - yinq - [Y]ank [I]nside [N]ext [']quote
+  --  - ci'  - [C]hange [I]nside [']quote
+  require('mini.ai').setup { n_lines = 500 }
+  -- Add/delete/replace surroundings (brackets, quotes, etc.)
+  --
+  -- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
+  -- - sd'   - [S]urround [D]elete [']quotes
+  -- - sr)'  - [S]urround [R]eplace [)] [']
+  require('mini.surround').setup()
+  require('mini.notify').setup()
+  require('mini.icons').setup()
+  local statusline = require 'mini.statusline'
+  statusline.setup { use_icons = vim.g.have_nerd_font }
+  statusline.section_location = function()
+    return '%2l:%-2v'
+  end
 
--- Jump to the type of the word under your cursor.
---  Useful when you're not sure what type a variable is and you want to see
---  the definition of its *type*, not where it was *defined*.
-map('<leader>D', require('telescope.builtin').lsp_type_definitions, 'Type [D]efinition')
+  require('oil').setup()
+  require('nvim-treesitter').setup {
+    auto_install = true,
+    highlight = {
+      enable = true,
+      -- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
+      --  If you are experiencing weird indenting issues, add the language to
+      --  the list of additional_vim_regex_highlighting and disabled languages for indent.
+      additional_vim_regex_highlighting = { 'ruby', 'python', 'c', 'cpp' },
+    },
+    indent = { enable = true, disable = { 'ruby', 'python', 'c', 'cpp' } },
+  }
 
--- Fuzzy find all the symbols in your current document.
---  Symbols are things like variables, functions, types, etc.
-map('<leader>ds', require('telescope.builtin').lsp_document_symbols, '[D]ocument [S]ymbols')
+  vim.cmd.packadd 'recipe-picker.nvim'
+  local picker = require 'recipe-picker'
+  vim.keymap.set('n', '<leader>sf', function()
+    picker.file_search { relative_height = 0.6, relative_width = 0.6 } -- position_color = '#aab86c' }
+  end, { desc = '[S]earch [F]iles' })
+  vim.keymap.set('n', '<leader>sq', function()
+    picker.resume()
+  end, { desc = '[S]earch [Q]resume' })
+  vim.keymap.set('n', '<leader>sg', picker.grep_search, { desc = '[S]earch by [G]rep' })
 
--- Fuzzy find all the symbols in your current workspace.
---  Similar to document symbols, except searches over your entire project.
-map('<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
+  -- In this case, we create a function that lets us more easily define mappings specific
+  -- for LSP related items. It sets the mode, buffer and description for us each time.
+  local map = function(keys, func, desc)
+    vim.keymap.set('n', keys, func, { desc = 'LSP: ' .. desc })
+  end
 
--- Rename the variable under your cursor.
---  Most Language Servers support renaming across files, etc.
-map('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
+  -- Jump to the definition of the word under your cursor.
+  --  This is where a variable was first declared, or where a function is defined, etc.
+  --  To jump back, press <C-t>.
+  vim.keymap.set('n', 'gd', vim.lsp.buf.definition, { desc = '[G]oto [D]efinition' })
 
--- Execute a code action, usually your cursor needs to be on top of an error
--- or a suggestion from your LSP for this to activate.
-map('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
+  -- Find references for the word under your cursor.
+  map('gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
 
---        -- Opens a popup that displays documentation about the word under your cursor
---        --  See `:help K` for why this keymap.
---        map('K', vim.lsp.buf.hover, 'Hover Documentation')
+  -- Jump to the implementation of the word under your cursor.
+  --  Useful when your language has ways of declaring types without an actual implementation.
+  map('gI', require('telescope.builtin').lsp_implementations, '[G]oto [I]mplementation')
 
--- WARN: This is not Goto Definition, this is Goto Declaration.
---  For example, in C this would take you to the header.
-map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
--- Global nutzbar machen
+  -- Jump to the type of the word under your cursor.
+  --  Useful when you're not sure what type a variable is and you want to see
+  --  the definition of its *type*, not where it was *defined*.
+  map('<leader>D', require('telescope.builtin').lsp_type_definitions, 'Type [D]efinition')
 
-map('<leader><Tab>', function()
-  require('utils').ClangdSwitchSourceHeader()
-end, 'switch between source and header')
-vim.api.nvim_set_hl(0, 'MiniCursorword', { bg = '#5a4a2f', underline = false })
-vim.api.nvim_set_hl(0, 'MiniCursorwordCurrent', { bg = '#5f875f', bold = true })
+  -- Fuzzy find all the symbols in your current document.
+  --  Symbols are things like variables, functions, types, etc.
+  map('<leader>ds', require('telescope.builtin').lsp_document_symbols, '[D]ocument [S]ymbols')
+
+  -- Fuzzy find all the symbols in your current workspace.
+  --  Similar to document symbols, except searches over your entire project.
+  map('<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
+
+  -- Rename the variable under your cursor.
+  --  Most Language Servers support renaming across files, etc.
+  map('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
+
+  -- Execute a code action, usually your cursor needs to be on top of an error
+  -- or a suggestion from your LSP for this to activate.
+  map('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
+
+  --        -- Opens a popup that displays documentation about the word under your cursor
+  --        --  See `:help K` for why this keymap.
+  --        map('K', vim.lsp.buf.hover, 'Hover Documentation')
+
+  -- WARN: This is not Goto Definition, this is Goto Declaration.
+  --  For example, in C this would take you to the header.
+  map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
+  -- Global nutzbar machen
+
+  map('<leader><Tab>', function()
+    require('utils').ClangdSwitchSourceHeader()
+  end, 'switch between source and header')
+  vim.api.nvim_set_hl(0, 'MiniCursorword', { bg = '#5a4a2f', underline = false })
+  vim.api.nvim_set_hl(0, 'MiniCursorwordCurrent', { bg = '#5f875f', bold = true })
+end)
 
 -- deferred loading and lazy loading
 vim.api.nvim_create_autocmd({ 'VimEnter' }, {
