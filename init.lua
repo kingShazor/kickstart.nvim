@@ -478,12 +478,12 @@ vim.schedule(function()
   vim.cmd.packadd 'recipe-picker.nvim'
   local picker = require 'recipe-picker'
   vim.keymap.set('n', '<leader>sf', function()
-    picker.file_search { relative_height = 0.6, relative_width = 0.6 } -- position_color = '#aab86c' }
+    picker.search_file { relative_height = 0.6, relative_width = 0.6 } -- position_color = '#aab86c' }
   end, { desc = '[S]earch [F]iles' })
   vim.keymap.set('n', '<leader>sq', function()
-    picker.resume()
+    picker.search_resume()
   end, { desc = '[S]earch [Q]resume' })
-  vim.keymap.set('n', '<leader>sg', picker.grep_search, { desc = '[S]earch by [G]rep' })
+  vim.keymap.set('n', '<leader>sg', picker.search_regex, { desc = '[S]earch by [G]rep' })
 
   -- In this case, we create a function that lets us more easily define mappings specific
   -- for LSP related items. It sets the mode, buffer and description for us each time.
