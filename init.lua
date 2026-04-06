@@ -412,7 +412,7 @@ vim.schedule(function()
   vim.keymap.set('n', '<leader>sl', function()
     builtin.find_files { cwd = vim.fn.expand '~/db', search_file = '*.sql' }
   end, { desc = 'Find [S]q[L] files' })
-  vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
+  -- vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
   vim.keymap.set('n', '<leader>gd', ':DiffviewOpen<CR>', { desc = 'Git Diffview open' })
   vim.keymap.set('n', '<leader>gD', ':DiffviewFileHistory<CR>', { desc = 'Git File History' })
 
@@ -484,6 +484,8 @@ vim.schedule(function()
     picker.search_resume()
   end, { desc = '[S]earch [Q]resume' })
   vim.keymap.set('n', '<leader>sg', picker.search_regex, { desc = '[S]earch by [G]rep' })
+  vim.keymap.set('n', '<leader><leader>', picker.search_buf, { desc = '[ ] Find existing buffers' })
+
 
   -- In this case, we create a function that lets us more easily define mappings specific
   -- for LSP related items. It sets the mode, buffer and description for us each time.
