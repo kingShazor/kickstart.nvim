@@ -27,15 +27,16 @@ M.createIntro = function()
   }
   local buf = vim.api.nvim_create_buf(false, true)
   vim.api.nvim_buf_set_lines(buf, 0, -1, false, intro)
+  local ns = vim.api.nvim_create_namespace('')
 
   vim.api.nvim_set_hl(0, 'IntroHighlight', { fg = '#ab8ae7', bold = true })
   vim.api.nvim_set_hl(0, 'IntroTextHighlight', { fg = '#bb9af7', bold = true })
   for i = 1, 8 do
-    vim.api.nvim_buf_add_highlight(buf, -1, 'IntroHighlight', i - 1, 0, -1)
+    vim.hl.range(buf, ns, 'IntroHighlight', { i - 1, 0 }, { i - 1, -1 })
   end
 
   for i = 10, #intro - 1 do
-    vim.api.nvim_buf_add_highlight(buf, -1, 'IntroTextHighlight', i - 1, 0, -1)
+    vim.hl.range(buf, ns, 'IntroTextHighlight', { i - 1, 0 }, { i - 1, -1 })
   end
   local width = math.floor(vim.o.columns * 0.4)
   local height = #intro
