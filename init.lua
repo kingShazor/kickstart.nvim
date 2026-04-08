@@ -409,9 +409,9 @@ vim.schedule(function()
   vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
   -- vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
   vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
-  vim.keymap.set('n', '<leader>sl', function()
-    builtin.find_files { cwd = vim.fn.expand '~/db', search_file = '*.sql' }
-  end, { desc = 'Find [S]q[L] files' })
+  -- vim.keymap.set('n', '<leader>sl', function()
+  --   builtin.find_files { cwd = vim.fn.expand '~/db', search_file = '*.sql' }
+  -- end, { desc = 'Find [S]q[L] files' })
   -- vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
   vim.keymap.set('n', '<leader>gd', ':DiffviewOpen<CR>', { desc = 'Git Diffview open' })
   vim.keymap.set('n', '<leader>gD', ':DiffviewFileHistory<CR>', { desc = 'Git File History' })
@@ -486,6 +486,9 @@ vim.schedule(function()
     { desc = '[S]earch current [W]ord' })
   vim.keymap.set('n', '<leader>sg', picker.search_regex, { desc = '[S]earch by [G]rep' })
   vim.keymap.set('n', '<leader><leader>', picker.search_buf, { desc = '[ ] Find existing buffers' })
+  vim.keymap.set('n', '<leader>sq', function()
+    picker.search_file { cwd = vim.fn.expand '~/db', fileTypes = 'sql' }
+  end, { desc = 'Find [S][Q]l files' })
 
   -- In this case, we create a function that lets us more easily define mappings specific
   -- for LSP related items. It sets the mode, buffer and description for us each time.
