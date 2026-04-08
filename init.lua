@@ -404,10 +404,10 @@ vim.schedule(function()
   vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
   -- vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
   vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
-  vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
+  -- vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
   -- vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
   vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
-  vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
+  -- vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
   vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
   vim.keymap.set('n', '<leader>sl', function()
     builtin.find_files { cwd = vim.fn.expand '~/db', search_file = '*.sql' }
@@ -480,12 +480,12 @@ vim.schedule(function()
   vim.keymap.set('n', '<leader>sf', function()
     picker.search_file { relative_height = 0.6, relative_width = 0.6 } -- position_color = '#aab86c' }
   end, { desc = '[S]earch [F]iles' })
-  vim.keymap.set('n', '<leader>sq', function()
-    picker.search_resume()
-  end, { desc = '[S]earch [Q]resume' })
+  vim.keymap.set('n', '<leader>sr', picker.search_resume, { desc = '[S]earch [R]esume' })
+  vim.keymap.set('n', '<leader>st', picker.search_text, { desc = '[S]earch [T]ext' })
+  vim.keymap.set('n', '<leader>sw', function() picker.search_text(vim.fn.expand('<cword>')) end,
+    { desc = '[S]earch current [W]ord' })
   vim.keymap.set('n', '<leader>sg', picker.search_regex, { desc = '[S]earch by [G]rep' })
   vim.keymap.set('n', '<leader><leader>', picker.search_buf, { desc = '[ ] Find existing buffers' })
-
 
   -- In this case, we create a function that lets us more easily define mappings specific
   -- for LSP related items. It sets the mode, buffer and description for us each time.
