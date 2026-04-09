@@ -439,6 +439,8 @@ vim.schedule(function()
     builtin.find_files { cwd = vim.fn.stdpath 'config' }
   end, { desc = '[S]earch [N]eovim files' })
 
+  -- vim.keymap.set('n', '<leader>sc',
+  --   builtin.colorscheme, { desc = '[S]earch [N]eovim files' })
   require('diffview').setup()
 
   -- Better Around/Inside textobjects
@@ -482,13 +484,17 @@ vim.schedule(function()
   end, { desc = '[S]earch [F]iles' })
   vim.keymap.set('n', '<leader>sr', picker.search_resume, { desc = '[S]earch [R]esume' })
   vim.keymap.set('n', '<leader>st', picker.search_text, { desc = '[S]earch [T]ext' })
-  vim.keymap.set('n', '<leader>sw', function() picker.search_text(vim.fn.expand('<cword>')) end,
-    { desc = '[S]earch current [W]ord' })
+  vim.keymap.set('n', '<leader>sw', function()
+    picker.search_text(vim.fn.expand '<cword>')
+  end, { desc = '[S]earch current [W]ord' })
   vim.keymap.set('n', '<leader>sg', picker.search_regex, { desc = '[S]earch by [G]rep' })
   vim.keymap.set('n', '<leader><leader>', picker.search_buf, { desc = '[ ] Find existing buffers' })
   vim.keymap.set('n', '<leader>sq', function()
     picker.search_file { cwd = vim.fn.expand '~/db', fileTypes = 'sql' }
   end, { desc = 'Find [S][Q]l files' })
+  vim.keymap.set('n', '<leader>sn', function()
+    picker.search_file { cwd = vim.fn.stdpath 'config' }
+  end, { desc = '[S]earch [N]eovim files' })
 
   -- In this case, we create a function that lets us more easily define mappings specific
   -- for LSP related items. It sets the mode, buffer and description for us each time.

@@ -1,9 +1,1 @@
-tags
-test.sh
-.luarc.json
-nvim
-lua/build/
-lua/.cache/
-
-spell/
-pack/local/opt/recipe-picker.nvim
+pack/
