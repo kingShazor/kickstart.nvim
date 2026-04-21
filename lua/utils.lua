@@ -127,7 +127,7 @@ M.ClangdSwitchSourceHeader = function()
   end
 
   local params = vim.lsp.util.make_text_document_params(bufnr)
-  client.request(method, params, function(err, result)
+  client:request(method, params, function(err, result)
     if err then
       vim.notify('Error switching source/header: ' .. err.message, vim.log.levels.ERROR)
       return
