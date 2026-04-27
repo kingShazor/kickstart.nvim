@@ -97,8 +97,6 @@ vim.keymap.set('n', '<C-k>', '0f=xhr{f;i }<Esc>$<Esc>', { desc = 'convert unsafe
 vim.keymap.set('n', '<v', '<c-v>', { desc = 'block mode' })
 vim.keymap.set('i', '<C-h>', '{', { desc = 'add "{"' })
 vim.keymap.set('i', '<C-n>', '}', { desc = 'add "}"' })
-vim.keymap.set('n', 'öb', '2F,w', { desc = 'next parameter' })
-vim.keymap.set('n', 'öw', 'f,w', { desc = 'prev parameter "}"' })
 
 local function mark_desc(mark)
   local tuple = vim.api.nvim_get_mark(mark, {})
@@ -236,7 +234,7 @@ vim.keymap.set('n', 'gk', function()
   require('utils').jump_to_function_name(true, true)
 end, { desc = 'pick to first caller' })
 
-vim.keymap.set('n', 'gö', function()
+vim.keymap.set('n', 'gh', function()
   require('utils').jump_to_function_name()
 end, { desc = 'jump to function name' })
 
@@ -337,7 +335,7 @@ vim.pack.add {
   'https://github.com/folke/which-key.nvim',
   'https://github.com/nvim-lua/plenary.nvim',
   'https://github.com/nvim-telescope/telescope.nvim',
-  'https://github.com/sindrets/diffview.nvim',
+  'https://github.com/dlyongemallo/diffview.nvim',
   'https://github.com/nvim-mini/mini.nvim',
   'https://github.com/stevearc/oil.nvim',
   'https://github.com/nvim-treesitter/nvim-treesitter',

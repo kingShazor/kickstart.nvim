@@ -5,8 +5,8 @@
       "src": "https://github.com/FabijanZulj/blame.nvim"
     },
     "diffview.nvim": {
-      "rev": "4516612fe98ff56ae0415a259ff6361a89419b0a",
-      "src": "https://github.com/sindrets/diffview.nvim"
+      "rev": "385f26fd6a50e3b0b11cc9623f1f96cde00ef08c",
+      "src": "https://github.com/dlyongemallo/diffview.nvim"
     },
     "mini.nvim": {
       "rev": "5849ef04c32a6a8e55957b946c0a275801d87530",
