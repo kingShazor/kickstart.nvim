@@ -95,8 +95,6 @@ end, { desc = 'open init' })
 vim.keymap.set('i', '<C-k>', '{  };<Esc>2hi', { desc = 'add safe C++ constructor { | } and start insert mode' })
 vim.keymap.set('n', '<C-k>', '0f=xhr{f;i }<Esc>$<Esc>', { desc = 'convert unsafe constructor into sage C++ constructor' })
 vim.keymap.set('n', '<v', '<c-v>', { desc = 'block mode' })
-vim.keymap.set('i', '<C-h>', '{', { desc = 'add "{"' })
-vim.keymap.set('i', '<C-n>', '}', { desc = 'add "}"' })
 
 local function mark_desc(mark)
   local tuple = vim.api.nvim_get_mark(mark, {})
@@ -347,6 +345,34 @@ vim.schedule(function()
   local wk = require 'which-key'
   wk.setup()
 
+  vim.keymap.set('i', 'ö', function()
+    return require('toggle_keys').coding and '[' or 'ö'
+  end, { expr = true, desc = 'coding "["' })
+
+  vim.keymap.set('i', 'Ö', function()
+    return require('toggle_keys').coding and '{' or 'Ö'
+  end, { expr = true, desc = 'coding "{"' })
+
+  vim.keymap.set('i', 'ä', function()
+    return require('toggle_keys').coding and ']' or 'ä'
+  end, { expr = true, desc = 'coding "]"' })
+
+  vim.keymap.set('i', 'Ä', function()
+    return require('toggle_keys').coding and '}' or 'Ä'
+  end, { expr = true, desc = 'coding "}"' })
+
+  vim.keymap.set('n', '<leader>t', function()
+    require('toggle_keys').toggle_keys()
+  end, { desc = 'toggle between coding and german writing keys' })
+
+  vim.keymap.set('n', 'ö', function()
+    vim.api.nvim_feedkeys(']', 'i', false)
+  end, { expr = true, desc = '"]"' })
+
+  vim.keymap.set('n', 'Ö', function()
+    vim.api.nvim_feedkeys('[', 'i', false)
+  end, { expr = true, desc = '"]"' })
+
   -- Document existing key chains
   wk.add {
     { '<leader>c', desc = '[C]ode', hidden = true },
@@ -354,7 +380,7 @@ vim.schedule(function()
     { '<leader>r', desc = '[R]ename', hidden = true },
     { '<leader>s', desc = '[S]earch', hidden = true },
     { '<leader>w', desc = '[W]orkspace', hidden = true },
-    { '<leader>t', desc = '[T]oggle', hidden = true },
+    { '<leader>to', desc = '[T]oggle', hidden = true },
     { '<leader>h', desc = 'Git [H]unk', hidden = true },
   }
   -- visual mode
