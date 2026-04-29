@@ -345,7 +345,8 @@ vim.schedule(function()
   local wk = require 'which-key'
   wk.setup()
 
-  require'toggle_keys'.initKeyMaps()
+  local tk = require'toggle_keys'
+  tk.initKeyMaps()
 
   -- Document existing key chains
   wk.add {
