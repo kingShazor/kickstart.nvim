@@ -4,8 +4,8 @@ local compile_commands_dir = os.getenv 'CLANGD_COMPILE_COMMANDS_DIR' or os.geten
 local clangd_bin = vim.fn.executable 'clangd' == 1 and 'clangd' or 'clangd-20'
 vim.lsp.config.clangd = {
   cmd = { clangd_bin, '--background-index', '--compile-commands-dir=' .. compile_commands_dir },
-  root_markers = { 'compile_commands.json', 'compile_flags.txt' },
-  filetypes = { 'c', 'cpp' },
+  root_markers = { '.git', '.clang-format' },
+  filetypes = { 'c', 'cpp', 'h' },
   general = { positionEncodings = { lsp_encoding } },
 }
 
@@ -23,7 +23,7 @@ vim.lsp.config.luals = {
   -- ".luarc.jsonc" file. Files that share a root directory will reuse
   -- the connection to the same LSP server.
   -- Nested lists indicate equal priority, see |vim.lsp.Config|.
-  root_markers = { '.luarc.json', '.luarc.jsonc', '.git' },
+  root_markers = { '.luarc.json', '.luarc.jsonc', '.git', '.stylua.toml' },
   -- Specific settings to send to the server. The schema for this is
   -- defined by the server. For example the schema for lua-language-server
   -- can be found here https://raw.githubusercontent.com/LuaLS/vscode-lua/master/setting/schema.json
