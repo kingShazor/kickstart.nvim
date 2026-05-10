@@ -5,11 +5,11 @@
       "src": "https://github.com/FabijanZulj/blame.nvim"
     },
     "diffview.nvim": {
-      "rev": "385f26fd6a50e3b0b11cc9623f1f96cde00ef08c",
+      "rev": "fe01c7c3f11575c8d732fc0c1d52890d33ce41c0",
       "src": "https://github.com/dlyongemallo/diffview.nvim"
     },
     "mini.nvim": {
-      "rev": "0f339bf5c93f392dc5d2417d47d7b9edc5f96fe8",
+      "rev": "a5fda91040763cf9ad70bdce1c656b0f4ba1d16e",
       "src": "https://github.com/nvim-mini/mini.nvim"
     },
     "nvim-treesitter": {
