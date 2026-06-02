@@ -287,6 +287,10 @@ vim.keymap.set('n', '<C-g>', function()
   require('utils').gitLogForBuf()
 end, { desc = '[<C-g] show git history for buffer' })
 
+vim.keymap.set('n', '<leader>c', function()
+  require('codereview').check_cpp()
+end, { desc = '[<leader>c] execute a cpp code review' })
+
 vim.keymap.set('n', '-', '<CMD>Oil<CR>', { desc = 'Open parent directory' })
 vim.diagnostic.config { virtual_text = true }
 
