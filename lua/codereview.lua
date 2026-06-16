@@ -19,7 +19,8 @@ M.check_cpp = function()
   })
 
   local lines = {}
-  vim.system({ 'opencode', 'run', '"/code-review-cpp-vim mach ein code review"', '-m', 'siemens/qwen-3.6-27b' }, {
+  -- github-copilot/gpt-5.3-codex siemens/qwen-3.6-27b
+  vim.system({ 'opencode', 'run', '"/code-review-cpp-vim mach ein code review"', '-m', 'github-copilot/gpt-5.3-codex' }, {
     text = true,
 
     stdout = function(_, data)
