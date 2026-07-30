@@ -437,11 +437,6 @@ vim.schedule(function()
     }
   end, { desc = '[S]earch [/] in Open Files' })
 
-  -- Shortcut for searching your Neovim configuration files
-  vim.keymap.set('n', '<leader>sn', function()
-    builtin.find_files { cwd = vim.fn.stdpath 'config' }
-  end, { desc = '[S]earch [N]eovim files' })
-
   -- vim.keymap.set('n', '<leader>sc',
   --   builtin.colorscheme, { desc = '[S]earch [N]eovim files' })
   require('diffview').setup()
@@ -498,6 +493,8 @@ vim.schedule(function()
   vim.keymap.set('n', '<leader>sn', function()
     picker.search_file { cwd = vim.fn.stdpath 'config' }
   end, { desc = '[S]earch [N]eovim files' })
+
+  vim.keymap.set('n', '<leader>si', picker.search_help_tags, { desc = '[S]earch [H]elp' })
 
   -- In this case, we create a function that lets us more easily define mappings specific
   -- for LSP related items. It sets the mode, buffer and description for us each time.
