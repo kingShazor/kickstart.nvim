@@ -1,17 +1,24 @@
 local lsp_encoding = 'utf-8'
 
-local compile_commands_dir = os.getenv 'CLANGD_COMPILE_COMMANDS_DIR' or os.getenv 'PWD' .. '/build'
+local compile_commands_dir = function()
+  if vim.loop.fs_stat(os.getenv 'PWD' .. '/compile_commands.json' ) then
+    return os.getenv('PWD');
+  end
+
+  return os.getenv 'CLANGD_COMPILE_COMMANDS_DIR' or os.getenv 'PWD' .. '/build'
+end
+
 local clangd_bin = vim.fn.executable 'clangd' == 1 and 'clangd' or 'clangd-20'
 vim.lsp.config.clangd = {
-  cmd = { clangd_bin, '--background-index', '--compile-commands-dir=' .. compile_commands_dir },
+  cmd = { clangd_bin, '--background-index', '--compile-commands-dir=' .. compile_commands_dir() },
   root_markers = { '.git', '.clang-format' },
-  filetypes = { 'c', 'cpp', 'h' },
+  filetypes = { 'c', 'cpp' },
   general = { positionEncodings = { lsp_encoding } },
 }
 
 local n = require('apt_packages_check').isDebian and ' -j 30' or ' -j 8'
 
-vim.opt.makeprg = 'ninja -C ' .. compile_commands_dir .. n
+vim.opt.makeprg = 'ninja -C ' .. compile_commands_dir() .. n
 
 vim.lsp.config.luals = {
   -- Command and arguments to start the server.
@@ -51,7 +58,7 @@ vim.lsp.config.zls = {
 }
 
 vim.lsp.config.pyright = {
-  cmd = { 'pyright', '--stdio' },
+  cmd = { 'pyright-langserver', '--stdio' },
   filetypes = { 'python' },
   general = { positionEncodings = { lsp_encoding } },
 }
