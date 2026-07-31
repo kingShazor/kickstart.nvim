@@ -332,8 +332,6 @@ vim.api.nvim_create_autocmd('PackChanged', {
 vim.pack.add {
   'https://github.com/FabijanZulj/blame.nvim',
   'https://github.com/folke/which-key.nvim',
-  'https://github.com/nvim-lua/plenary.nvim',
-  'https://github.com/nvim-telescope/telescope.nvim',
   'https://github.com/dlyongemallo/diffview.nvim',
   'https://github.com/nvim-mini/mini.nvim',
   'https://github.com/stevearc/oil.nvim',
@@ -366,81 +364,10 @@ vim.schedule(function()
 
   register_marks()
 
-  require('telescope').setup {
-    -- You can put your default mappings / updates / etc. in here
-    --  All the info you're looking for is in `:help telescope.setup()`
-    --
-    -- defaults = {
-    --   mappings = {
-    --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
-    --   },
-    -- },
-    defaults = {
-      layout_config = {
-        width = 0.99,
-      },
-    },
-    extensions = {
-      fuzzy_finder = {
-        fuzzy = true, -- false will only do exact matching
-        override_generic_sorter = true, -- override the generic sorter
-        override_file_sorter = true, -- override the file sorter
-        case_mode = 'smart_case', -- or "ignore_case" or "respect_case"
-        -- the default case_mode is "smart_case"
-      },
-    },
-    pickers = {
-      find_files = { path_display = { 'absolute' }, hidden = true },
-      keymaps = { layout_config = { prompt_position = 'top' } },
-      grep_string = { path_display = { 'smart' } },
-      oldfiles = { path_display = { 'smart' } },
-      buffers = { path_display = { 'smart' } },
-      lsp_references = { path_display = { 'tail' } },
-    },
-  }
-
-  pcall(require('telescope').load_extension, 'fuzzy_sorter')
-  -- See `:help telescope.builtin`
-  local builtin = require 'telescope.builtin'
-
-  vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
-  vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
-  -- vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
-  vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
-  -- vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
-  -- vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
-  vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
-  -- vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
-  vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
-  -- vim.keymap.set('n', '<leader>sl', function()
-  --   builtin.find_files { cwd = vim.fn.expand '~/db', search_file = '*.sql' }
-  -- end, { desc = 'Find [S]q[L] files' })
-  -- vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
-  vim.keymap.set('n', '<leader>gd', ':DiffviewOpen<CR>', { desc = 'Git Diffview open' })
-  vim.keymap.set('n', '<leader>gD', ':DiffviewFileHistory<CR>', { desc = 'Git File History' })
-
-  -- Slightly advanced example of overriding default behavior and theme
-  vim.keymap.set('n', '<leader>/', function()
-    -- You can pass additional configuration to Telescope to change the theme, layout, etc.
-    builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
-      winblend = 10,
-      previewer = false,
-    })
-  end, { desc = '[/] Fuzzily search in current buffer' })
-
-  -- It's also possible to pass additional configuration options.
-  --  See `:help telescope.builtin.live_grep()` for information about particular keys
-  vim.keymap.set('n', '<leader>s/', function()
-    builtin.live_grep {
-      grep_open_files = true,
-      prompt_title = 'Live Grep in Open Files',
-    }
-  end, { desc = '[S]earch [/] in Open Files' })
-
-  -- vim.keymap.set('n', '<leader>sc',
-  --   builtin.colorscheme, { desc = '[S]earch [N]eovim files' })
   require('diffview').setup()
 
+  vim.keymap.set('n', '<leader>gd', ':DiffviewOpen<CR>', { desc = 'Git Diffview open' })
+  vim.keymap.set('n', '<leader>gD', ':DiffviewFileHistory<CR>', { desc = 'Git File History' })
   -- Better Around/Inside textobjects
   --
   -- Examples:
@@ -494,7 +421,7 @@ vim.schedule(function()
     picker.search_file { cwd = vim.fn.stdpath 'config' }
   end, { desc = '[S]earch [N]eovim files' })
 
-  vim.keymap.set('n', '<leader>si', picker.search_help_tags, { desc = '[S]earch [H]elp' })
+  vim.keymap.set('n', '<leader>sh', picker.search_help_tags, { desc = '[S]earch [H]elp' })
 
   -- In this case, we create a function that lets us more easily define mappings specific
   -- for LSP related items. It sets the mode, buffer and description for us each time.
@@ -506,26 +433,6 @@ vim.schedule(function()
   --  This is where a variable was first declared, or where a function is defined, etc.
   --  To jump back, press <C-t>.
   vim.keymap.set('n', 'gd', vim.lsp.buf.definition, { desc = '[G]oto [D]efinition' })
-
-  -- Find references for the word under your cursor.
-  map('gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
-
-  -- Jump to the implementation of the word under your cursor.
-  --  Useful when your language has ways of declaring types without an actual implementation.
-  map('gI', require('telescope.builtin').lsp_implementations, '[G]oto [I]mplementation')
-
-  -- Jump to the type of the word under your cursor.
-  --  Useful when you're not sure what type a variable is and you want to see
-  --  the definition of its *type*, not where it was *defined*.
-  map('<leader>D', require('telescope.builtin').lsp_type_definitions, 'Type [D]efinition')
-
-  -- Fuzzy find all the symbols in your current document.
-  --  Symbols are things like variables, functions, types, etc.
-  map('<leader>ds', require('telescope.builtin').lsp_document_symbols, '[D]ocument [S]ymbols')
-
-  -- Fuzzy find all the symbols in your current workspace.
-  --  Similar to document symbols, except searches over your entire project.
-  map('<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
 
   -- Rename the variable under your cursor.
   --  Most Language Servers support renaming across files, etc.
