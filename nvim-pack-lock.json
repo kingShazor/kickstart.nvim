@@ -5,15 +5,15 @@
       "src": "https://github.com/FabijanZulj/blame.nvim"
     },
     "diffview.nvim": {
-      "rev": "b9f10d68116bd3f8d54197a067e11cebfb41b268",
+      "rev": "43e60bca414e4991ed10118e59f809fb03bbeddd",
       "src": "https://github.com/dlyongemallo/diffview.nvim"
     },
     "mini.nvim": {
-      "rev": "c5cdbadeb423ff724e27a42ab2d1c504d1d6fc5a",
+      "rev": "9d01f392b33fb2ba36fbc87fc0bf4453e63ffb0a",
       "src": "https://github.com/nvim-mini/mini.nvim"
     },
     "nvim-treesitter": {
-      "rev": "4916d6592ede8c07973490d9322f187e07dfefac",
+      "rev": "427e9222363d07c32d6db6169e4049c28d58d141",
       "src": "https://github.com/nvim-treesitter/nvim-treesitter"
     },
     "oil.nvim": {
