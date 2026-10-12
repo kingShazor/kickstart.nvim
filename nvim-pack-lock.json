@@ -5,7 +5,7 @@
       "src": "https://github.com/FabijanZulj/blame.nvim"
     },
     "diffview.nvim": {
-      "rev": "e2699210207b525bc6d9857b65fe90cd78b0ec86",
+      "rev": "5ec4af8064924259f72c27f7d1e051a5bd643edf",
       "src": "https://github.com/dlyongemallo/diffview.nvim"
     },
     "mini.nvim": {
@@ -17,7 +17,7 @@
       "src": "https://github.com/nvim-treesitter/nvim-treesitter"
     },
     "oil.nvim": {
-      "rev": "b73018b75affd13fa38e2fc94ef753b465f770d7",
+      "rev": "d3733d933833a0e59b813ecec99341527adf0c28",
       "src": "https://github.com/stevearc/oil.nvim"
     },
     "which-key.nvim": {
