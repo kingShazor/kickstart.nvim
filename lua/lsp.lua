@@ -16,7 +16,7 @@ vim.lsp.config.clangd = {
   general = { positionEncodings = { lsp_encoding } },
 }
 
-local n = require('apt_packages_check').isDebian and ' -j 30' or ' -j 8'
+local n = require('apt_packages_check').isDebian and ' -j 40' or ' -j 8'
 
 vim.opt.makeprg = 'ninja -C ' .. compile_commands_dir() .. n
 
