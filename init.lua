@@ -24,6 +24,20 @@ vim.opt.mouse = 'a'
 -- Don't show the mode, since it's already in the status line
 vim.opt.showmode = false
 
+if not vim.env.TMUX and not vim.env.DISPLAY and not vim.env.WAYLAND_DISPLAY then
+  -- No tmux/X11/Wayland (e.g. plain SSH): copy via OSC 52 to the local terminal.
+  -- Paste falls back to the unnamed register, since many terminals block OSC 52 reads.
+  local osc52 = require 'vim.ui.clipboard.osc52'
+  local function paste()
+    return { vim.fn.split(vim.fn.getreg '"', '\n'), vim.fn.getregtype '"' }
+  end
+  vim.g.clipboard = {
+    name = 'OSC 52',
+    copy = { ['+'] = osc52.copy '+', ['*'] = osc52.copy '*' },
+    paste = { ['+'] = paste, ['*'] = paste },
+  }
+end
+
 vim.opt.clipboard = 'unnamedplus'
 
 vim.opt.breakindent = true
